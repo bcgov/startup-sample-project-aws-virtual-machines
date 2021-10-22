@@ -1,0 +1,125 @@
+---
+ - hosts: localhost
+   become: true
+   tasks:    
+    - name: install curl
+      yum:
+        name: curl
+        state: present
+        
+    - name: install epel
+      become: true
+      become_user: root
+      shell: amazon-linux-extras install epel
+
+    - name: install nginx
+      become: true
+      become_user: root
+      shell: sudo amazon-linux-extras install nginx1
+
+    - name: downloading the node.js
+      become: true
+      become_user: root
+      shell: curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
+
+    - name: installing the nodejs
+      become: true
+      become_user: root
+      shell: yum install -y nodejs
+
+    - name: Install the frontend dependencies
+      command: npm install
+      args:
+       chdir: /home/ssm-user/repos/client
+       executable: /bin/bash
+    - name: Build the frontend
+      command: npm run build
+      args:
+       chdir: /home/ssm-user/repos/client
+       executable: /bin/bash
+    
+    - name: adding nginx user to root
+      become: true
+      become_user: root
+      shell: usermod -aG root nginx
+
+
+    - name: Creates directory
+      become: true
+      file:
+        path: /var/www/app
+        state: directory
+
+    - name: make the build package
+      local_action: shell tar -c -z -f app.zip -C ../client/build .
+      become: yes
+
+    - name: unpack build package
+      become: yes
+      shell: "tar -xf /home/ssm-user/repos/playbook/app.zip -C /var/www/app"
+      
+    - name: set the right permissions to app directories
+      become: true
+      become_user: root
+      shell: sudo find /var/www -type d -exec chmod -R 755 {} \;
+      
+    - name: set the right permissions to app files
+      become: true
+      become_user: root
+      shell: sudo find /var/www -type f -exec chmod -R 644 {} \;  
+      
+    - name: Change the SELinux type of the new /var/test_www/html/ content directory to the type of the default /var/www/html directory
+      become: true
+      become_user: root
+      shell: sudo semanage fcontext -a -e /var/www /var/test_www
+      
+    - name: Relabel the /var directory recursively
+      become: yes
+      become_user: root
+      shell: sudo restorecon -Rv /var/
+
+
+    - name: Copy nginx config files
+      copy:
+        src: "../files/nginx.conf"
+        dest: "/etc/nginx/nginx.conf"
+        mode: 0644
+
+    - name: Update client nginx config  
+      copy:
+        src: "../files/client.conf"
+        dest: "/etc/nginx/conf.d/client.conf"
+        mode: 0644
+
+    - name: Enable Nginx
+      service: name=nginx enabled=yes
+      become: yes
+
+    - name: restart nginx
+      service:
+         name: nginx
+         state: restarted
+         
+    - name: Open Port 8080 from instance firewall
+      become: yes
+      become_user: root
+      shell : iptables -I INPUT 3 -s 0.0.0.0/0 -d 0.0.0.0/0 -p tcp --dport 8080 -m state --state New -j ACCEPT 
+      
+      
+    - name: SELinux denied permission to make outgoing network connections
+      become: yes
+      become_user: root
+      shell: setsebool -P httpd_can_network_connect 1
+      
+      
+    - name: Installing the Backend Dependencies
+      command: npm install
+      args:
+       chdir: /home/ssm-user/repos/server
+       executable: /bin/bash
+
+    - name: Installing the Backend Dependencies
+      command: npm start
+      args:
+       chdir: /home/ssm-user/repos/server
+       executable: /bin/bash
