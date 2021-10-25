@@ -1,10 +1,64 @@
-variable "target_env" {
-  description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
-}
+ variable "target_env" {
+   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
+ }
 
 variable "target_aws_account_id" {
   description = "AWS workload account id"
 }
+variable "git_repo" {
+  description = "Name of the git repo to clone"
+  default     = "github.com/prabhukiran9999/ssp-vm-version"
+  type        = string
+}
+variable "target_group_name" {
+  description = "Name of the target group"
+  default     = "sample-target-group-vm"
+  type        = string
+}
+variable "lc_name" {
+  description = "Name of the launch configuration"
+  default     = "sssp-vm-lc"
+  type        = string
+}
+variable "iamge_id" {
+  description = "id of the ami used"
+  default     = "ami-037c167242ac48a38"
+  type        = string
+}
+
+variable "asg_name" {
+  description = "name of the autoscaling group created"
+  default     = "ssp-vm-asg"
+  type        = string
+}
+
+variable "table_name" {
+  description = "name of the dynamodb table created"
+  default     = "ssp-greetings-vm"
+  type        = string
+}
+variable "instances_name" {
+  description = "name of the asg instances created"
+  default     = "asg-instances"
+  type        = string
+}
+
+variable "policy_name" {
+  description = "name of the policy created"
+  default     = "ssp_db"
+  type        = string
+}
+variable "role_name" {
+  description = "name of the role created"
+  default     = "ssp-db"
+  type        = string
+}
+variable "iam_profile" {
+  description = "name of the IAM profile created"
+  default     = "ssp_profile"
+  type        = string
+}
+
 
 variable "alb_name" {
   description = "Name of the internal alb"

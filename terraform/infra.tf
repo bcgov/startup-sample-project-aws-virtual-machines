@@ -13,7 +13,7 @@ provider "aws" {
 
 /* Dynamo DB Table */
 resource "aws_dynamodb_table" "ssp-greetings" {
-  name      = "ssp-greetings-vm"
+  name      = var.table_name
   hash_key  = "pid"
   range_key = "createdAt"
 
@@ -41,10 +41,10 @@ data "aws_alb_listener" "front_end" {
 }
 
 resource "aws_alb_target_group" "app" {
-  name                 = "sample-target-group-vm"
+  name                 = var.target_group_name
   port                 = var.app_port
   protocol             = "HTTP"
-  vpc_id               = "vpc-018906cab60cf165b"
+  vpc_id               = module.network.aws_vpc.id
   target_type          = "instance"
   deregistration_delay = 30
 
@@ -76,21 +76,29 @@ resource "aws_lb_listener_rule" "host_based_weighted_routing" {
   }
 }
 
+data "template_file" "userdata_script" {
+template = file("userdata.tpl")
+vars = {
+git_repo           = var.git_repo
+}
+}
+
+
 /* Auto Scaling & Launch Configuration */
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
 
-  name = "asg-instances"
+  name = var.instances_name
 
   # Launch configuration creation
-  lc_name              = "sssp-vm-lc"
-  image_id             = "ami-037c167242ac48a38"
+  lc_name              = var.lc_name
+  image_id             = var.iamge_id
   instance_type        = "t2.micro"
   spot_price            = "0.0038"
-  security_groups      = ["sg-03895fdd9a15adf6e"]
-  iam_instance_profile = "ssp_profile"
-  user_data            = file("userdata.sh")
+  security_groups = [module.network.aws_security_groups.app.id]
+  iam_instance_profile = var.iam_profile
+  user_data = "${data.template_file.userdata_script.rendered}"
 
 
 
@@ -103,8 +111,8 @@ module "asg" {
   ]
 
   # Auto scaling group creation
-  asg_name                  = "ssp-vm-asg"
-  vpc_zone_identifier       = ["subnet-048e25be105ae01d3", "subnet-0896ff158c3ecdc53"]
+  asg_name                  = var.asg_name
+  vpc_zone_identifier       = module.network.aws_subnet_ids.app.ids
   health_check_type         = "EC2"
   min_size                  = 1
   max_size                  = 1
@@ -124,6 +132,7 @@ module "asg" {
 
 }
 
+
 terraform {
   required_providers {
     aws = {
@@ -134,12 +143,12 @@ terraform {
 }
 
 resource "aws_iam_instance_profile" "ssp_profile" {
-  name = "ssp_profile"
+  name = var.iam_profile
   role = aws_iam_role.ssp-db.name
 }
 
 resource "aws_iam_role" "ssp-db" {
-  name = "ssp-db"
+  name = var.role_name
 
   assume_role_policy = <<EOF
 {
@@ -158,7 +167,7 @@ EOF
 }
 
 resource "aws_iam_policy" "db_ssp" {
-  name = "ssp_db"
+  name = var.policy_name
 
   description = "policy to give dybamodb permissions to ec2"
 
