@@ -6,7 +6,7 @@ variable "target_aws_account_id" {
   description = "AWS workload account id"
 }
 variable "git_url" {
-  description = "Name of the git repo to clone"
+  description = "url of the git repo to clone"
   default     = "github.com/bcgov/startup-sample-project-aws-virtual-machines.git"
   type        = string
 }

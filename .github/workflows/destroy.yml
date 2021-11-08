@@ -45,7 +45,7 @@ jobs:
           
             
 
-      - name: Deploying startup-sample-project using terraform
+      - name: Destroying startup-sample-project using terraform
         run: |
             cd terraform/
             cat <<EOF > backend.hcl

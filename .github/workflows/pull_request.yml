@@ -40,7 +40,7 @@ jobs:
             terraform_version: ${{ env.TF_VERSION }}
             cli_config_credentials_token: ${{ secrets.TFC_TEAM_TOKEN }}
 
-      - name: Deploying startup-sample-project using terraform
+      - name: Planning startup-sample-project using terraform
         uses: hashicorp/setup-terraform@v1
       - run: |
             cd terraform/
