@@ -1,14 +1,14 @@
- terraform {
-   backend "remote" {}
- }
+terraform {
+  backend "remote" {}
+}
 
 
 
 provider "aws" {
   region = var.aws_region
-   assume_role {
-     role_arn = "arn:aws:iam::${var.target_aws_account_id}:role/BCGOV_${var.target_env}_Automation_Admin_Role"
-   }
+  assume_role {
+    role_arn = "arn:aws:iam::${var.target_aws_account_id}:role/BCGOV_${var.target_env}_Automation_Admin_Role"
+  }
 }
 
 /* Dynamo DB Table */
@@ -76,11 +76,15 @@ resource "aws_lb_listener_rule" "host_based_weighted_routing" {
   }
 }
 
+
+
 data "template_file" "userdata_script" {
-template = file("userdata.tpl")
-vars = {
-git_repo           = var.git_repo
-}
+  template = file("userdata.tpl")
+  vars = {
+    git_repo    = var.git_repo
+    BRANCH_NAME = var.BRANCH_NAME
+    sha         = var.sha
+  }
 }
 
 
@@ -95,10 +99,10 @@ module "asg" {
   lc_name              = var.lc_name
   image_id             = var.iamge_id
   instance_type        = "t2.micro"
-  spot_price            = "0.0038"
-  security_groups = [module.network.aws_security_groups.app.id]
+  spot_price           = "0.0038"
+  security_groups      = [module.network.aws_security_groups.app.id]
   iam_instance_profile = var.iam_profile
-  user_data = "${data.template_file.userdata_script.rendered}"
+  user_data            = data.template_file.userdata_script.rendered
 
 
 
