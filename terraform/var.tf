@@ -5,16 +5,12 @@ variable "target_env" {
 variable "target_aws_account_id" {
   description = "AWS workload account id"
 }
-variable "git_repo" {
+variable "git_url" {
   description = "Name of the git repo to clone"
   default     = "github.com/bcgov/startup-sample-project-aws-virtual-machines.git"
   type        = string
 }
-variable "BRANCH_NAME" {
-  description = "Name of the git branch to clone"
-  default     = "main"
-  type        = string
-}
+
 variable "sha" {
   description = "Id of the git commit to checkout"
   type        = string
