@@ -36,6 +36,11 @@ variable "asg_name" {
   default     = "ssp-vm-asg"
   type        = string
 }
+variable "branch" {
+  description = "name of the autoscaling group created"
+  default     = "main"
+  type        = string
+}
 
 variable "table_name" {
   description = "name of the dynamodb table created"

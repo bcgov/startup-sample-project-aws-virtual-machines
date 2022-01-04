@@ -102,6 +102,8 @@ data "template_file" "userdata_script" {
     sha        = var.sha
     bucketName = aws_s3_bucket.upload_bucket.id
     DB_NAME    = aws_dynamodb_table.ssp-greetings.id
+    branch     = var.branch
+
   }
 }
 

@@ -31,6 +31,7 @@ jobs:
              cat <<EOF > dev.auto.tfvars
              sha = "${{ env.SHA }}"
              git_url= "${{ env.GIT_URL }}"
+             branch ="dev"
              
              EOF
              
