@@ -12,7 +12,7 @@ env:
   environment: dev
   organization: bcgov
   GIT_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
-  SHA: ${{ github.sha }}
+  SHA: ${{github.event.pull_request.head.sha}}
   
 jobs:
   build:
@@ -50,4 +50,4 @@ jobs:
             EOF
             
             terraform init -backend-config=backend.hcl
-            terraform apply -auto-approve
+            terraform plan
