@@ -11,9 +11,14 @@ provider "aws" {
   }
 }
 
+resource "random_pet" "DB_NAME" {
+  prefix = "ssp-greetings"
+  length = 2
+}
+
 /* Dynamo DB Table */
 resource "aws_dynamodb_table" "ssp-greetings" {
-  name      = var.table_name
+  name      = random_pet.DB_NAME.id
   hash_key  = "pid"
   range_key = "createdAt"
 
@@ -32,6 +37,18 @@ resource "aws_dynamodb_table" "ssp-greetings" {
 }
 data "aws_alb" "main" {
   name = var.alb_name
+}
+
+# s3 bucket where the images are uploaded
+resource "random_pet" "upload_bucket_name" {
+  prefix = "upload-bucket"
+  length = 2
+}
+
+resource "aws_s3_bucket" "upload_bucket" {
+  bucket        = random_pet.upload_bucket_name.id
+  acl           = "private"
+  force_destroy = true
 }
 
 # Redirect all traffic from the ALB to the target group
@@ -82,7 +99,9 @@ data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
     git_url    = var.git_url
-    sha         = var.sha
+    sha        = var.sha
+    bucketName = aws_s3_bucket.upload_bucket.id
+    DB_NAME    = aws_dynamodb_table.ssp-greetings.id
   }
 }
 
@@ -210,7 +229,10 @@ resource "aws_iam_policy" "db_ssp" {
       },
       {
         "Action" : "s3:GetEncryptionConfiguration",
-        "Resource" : "*",
+        "Resource": [
+                "${aws_s3_bucket.upload_bucket.arn}",
+                "${aws_s3_bucket.upload_bucket.arn}/*"
+            ],
         "Effect" : "Allow"
       },
       {
