@@ -16,7 +16,7 @@ const Greeter = ({ isDisabled, submitLoading, submitError }) => {
 
         {/** Title */}
         <Grid item xs={12}>
-          <Typography variant="subtitle1">Select your favorite greeting</Typography>
+          <Typography variant="subtitle1">Select your favorite greeting (or) Upload an Image</Typography>
           <Divider />
         </Grid>
 
