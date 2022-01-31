@@ -11,13 +11,18 @@ provider "aws" {
   }
 }
 
+resource "random_pet" "DB_NAME" {
+  prefix = "ssp-greetings"
+  length = 2
+}
+
 /* Dynamo DB Table */
 resource "aws_dynamodb_table" "ssp-greetings" {
-  name      = var.table_name
+  name      = random_pet.DB_NAME.id
   hash_key  = "pid"
   range_key = "createdAt"
 
-  billing_mode   = "PAY_PER_REQUEST"
+  # billing_mode   = "PAY_PER_REQUEST"
   read_capacity  = 20
   write_capacity = 20
   attribute {
@@ -34,14 +39,30 @@ data "aws_alb" "main" {
   name = var.alb_name
 }
 
+# s3 bucket where the images are uploaded
+resource "random_pet" "upload_bucket_name" {
+  prefix = "upload-bucket"
+  length = 2
+}
+
+resource "aws_s3_bucket" "upload_bucket" {
+  bucket        = random_pet.upload_bucket_name.id
+  acl           = "private"
+  force_destroy = true
+}
+
 # Redirect all traffic from the ALB to the target group
 data "aws_alb_listener" "front_end" {
   load_balancer_arn = data.aws_alb.main.id
   port              = 443
 }
+resource "random_pet" "target_group_name" {
+  prefix = "ssp"
+  length = 2
+}
 
 resource "aws_alb_target_group" "app" {
-  name                 = var.target_group_name
+  name                 = random_pet.target_group_name.id
   port                 = var.app_port
   protocol             = "HTTP"
   vpc_id               = module.network.aws_vpc.id
@@ -83,17 +104,25 @@ data "template_file" "userdata_script" {
   vars = {
     git_url    = var.git_url
     sha        = var.sha
+    bucketName = aws_s3_bucket.upload_bucket.id
+    DB_NAME    = aws_dynamodb_table.ssp-greetings.id
     branch     = var.branch
+
   }
+}
+
+resource "random_pet" "instances_name" {
+  prefix = "ssp"
+  length = 2
 }
 
 
 /* Auto Scaling & Launch Configuration */
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
-  name = var.instances_name
+  name = random_pet.instances_name.id
 
   # Launch configuration creation
   lc_name              = var.lc_name
@@ -101,8 +130,11 @@ module "asg" {
   instance_type        = "t2.micro"
   spot_price           = "0.0038"
   security_groups      = [module.network.aws_security_groups.app.id]
-  iam_instance_profile = var.iam_profile
+  iam_instance_profile_name = random_pet.instances_name.id
   user_data            = data.template_file.userdata_script.rendered
+  use_lc    = true
+  create_lc = true
+  
 
 
 
@@ -114,8 +146,8 @@ module "asg" {
     },
   ]
 
+
   # Auto scaling group creation
-  asg_name                  = var.asg_name
   vpc_zone_identifier       = module.network.aws_subnet_ids.app.ids
   health_check_type         = "EC2"
   min_size                  = 1
@@ -124,6 +156,15 @@ module "asg" {
   wait_for_capacity_timeout = 0
   health_check_grace_period = 500
   target_group_arns         = [aws_alb_target_group.app.arn]
+
+  instance_refresh = {	
+    strategy = "Rolling"	
+    preferences = {	
+      min_healthy_percentage = 50	
+    }	
+    triggers = ["tag"]	
+  }	
+
 
 
   tags = [
@@ -141,19 +182,18 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "3.63.0"
+      version = ">=3.63.0"
     }
   }
 }
 
 resource "aws_iam_instance_profile" "ssp_profile" {
-  name = var.iam_profile
+  name = random_pet.instances_name.id
   role = aws_iam_role.ssp-db.name
 }
 
 resource "aws_iam_role" "ssp-db" {
-  name = var.role_name
-
+  name = random_pet.instances_name.id
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -171,7 +211,7 @@ EOF
 }
 
 resource "aws_iam_policy" "db_ssp" {
-  name = var.policy_name
+  name = random_pet.instances_name.id
 
   description = "policy to give dybamodb permissions to ec2"
 
@@ -211,7 +251,10 @@ resource "aws_iam_policy" "db_ssp" {
       },
       {
         "Action" : "s3:GetEncryptionConfiguration",
-        "Resource" : "*",
+        "Resource": [
+                "${aws_s3_bucket.upload_bucket.arn}",
+                "${aws_s3_bucket.upload_bucket.arn}/*"
+            ],
         "Effect" : "Allow"
       },
       {
