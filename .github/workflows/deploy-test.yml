@@ -12,6 +12,7 @@ env:
   organization: bcgov
   SHA: ${{ github.sha }}
   GIT_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY	
+  branch : ${GITHUB_REF##*/}
 
   
 jobs:
@@ -26,7 +27,7 @@ jobs:
       
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: $ echo ${GITHUB_REF##*/}
         id: extract_branch
       
       - name: setting variables
