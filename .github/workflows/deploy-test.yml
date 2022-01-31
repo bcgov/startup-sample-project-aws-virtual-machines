@@ -24,12 +24,18 @@ jobs:
         uses: actions/checkout@v2
       
       
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+      
       - name: setting variables
         run: | 
              cd terraform/
              cat <<EOF > test.auto.tfvars
              sha = "${{ env.SHA }}"
              git_url= "${{ env.GIT_URL }}"
+             branch = "extract_branch"
              EOF
              
                                     
@@ -57,4 +63,4 @@ jobs:
             
             terraform init -backend-config=backend.hcl
             
-            terraform apply -auto-approve 
+            terraform plan 
