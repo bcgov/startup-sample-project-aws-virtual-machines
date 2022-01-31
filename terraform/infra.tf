@@ -6,9 +6,9 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
-  assume_role {
-    role_arn = "arn:aws:iam::${var.target_aws_account_id}:role/BCGOV_${var.target_env}_Automation_Admin_Role"
-  }
+  # assume_role {
+  #   role_arn = "arn:aws:iam::${var.target_aws_account_id}:role/BCGOV_${var.target_env}_Automation_Admin_Role"
+  # }
 }
 
 resource "random_pet" "DB_NAME" {
@@ -22,7 +22,7 @@ resource "aws_dynamodb_table" "ssp-greetings" {
   hash_key  = "pid"
   range_key = "createdAt"
 
-  billing_mode   = "PAY_PER_REQUEST"
+  # billing_mode   = "PAY_PER_REQUEST"
   read_capacity  = 20
   write_capacity = 20
   attribute {
