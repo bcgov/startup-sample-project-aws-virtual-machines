@@ -12,7 +12,7 @@ env:
   organization: bcgov
   SHA: ${{ github.sha }}
   GIT_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY	
-  branch : ${GITHUB_REF##*/}
+  Branch : ${GITHUB_REF##*/}
 
   
 jobs:
@@ -36,7 +36,7 @@ jobs:
              cat <<EOF > test.auto.tfvars
              sha = "${{ env.SHA }}"
              git_url= "${{ env.GIT_URL }}"
-             branch = "extract_branch"
+             branch = "${{ env.Branch }}"
              EOF
              
                                     
@@ -64,4 +64,4 @@ jobs:
             
             terraform init -backend-config=backend.hcl
             
-            terraform plan 
+            terraform apply -auto-approve 
