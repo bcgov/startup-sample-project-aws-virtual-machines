@@ -22,7 +22,7 @@ resource "aws_dynamodb_table" "ssp-greetings" {
   hash_key  = "pid"
   range_key = "createdAt"
 
-  billing_mode   = "PAY_PER_REQUEST"
+  # billing_mode   = "PAY_PER_REQUEST"
   read_capacity  = 20
   write_capacity = 20
   attribute {
@@ -125,16 +125,16 @@ module "asg" {
   name = random_pet.instances_name.id
 
   # Launch configuration creation
-  lc_name              = var.lc_name
-  image_id             = var.iamge_id
-  instance_type        = "t2.micro"
-  spot_price           = "0.0038"
-  security_groups      = [module.network.aws_security_groups.app.id]
+  lc_name                   = var.lc_name
+  image_id                  = var.iamge_id
+  instance_type             = "t2.micro"
+  spot_price                = "0.0038"
+  security_groups           = [module.network.aws_security_groups.app.id]
   iam_instance_profile_name = random_pet.instances_name.id
-  user_data            = data.template_file.userdata_script.rendered
-  use_lc    = true
-  create_lc = true
-  
+  user_data                 = data.template_file.userdata_script.rendered
+  use_lc                    = true
+  create_lc                 = true
+
 
 
 
@@ -157,13 +157,13 @@ module "asg" {
   health_check_grace_period = 500
   target_group_arns         = [aws_alb_target_group.app.arn]
 
-  instance_refresh = {	
-    strategy = "Rolling"	
-    preferences = {	
-      min_healthy_percentage = 50	
-    }	
-    triggers = ["tag"]	
-  }	
+  instance_refresh = {
+    strategy = "Rolling"
+    preferences = {
+      min_healthy_percentage = 50
+    }
+    triggers = ["tag"]
+  }
 
 
 
@@ -193,7 +193,7 @@ resource "aws_iam_instance_profile" "ssp_profile" {
 }
 
 resource "aws_iam_role" "ssp-db" {
-  name = random_pet.instances_name.id
+  name               = random_pet.instances_name.id
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -251,10 +251,10 @@ resource "aws_iam_policy" "db_ssp" {
       },
       {
         "Action" : "s3:GetEncryptionConfiguration",
-        "Resource": [
-                "${aws_s3_bucket.upload_bucket.arn}",
-                "${aws_s3_bucket.upload_bucket.arn}/*"
-            ],
+        "Resource" : [
+          "${aws_s3_bucket.upload_bucket.arn}",
+          "${aws_s3_bucket.upload_bucket.arn}/*"
+        ],
         "Effect" : "Allow"
       },
       {
