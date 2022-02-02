@@ -60,7 +60,7 @@ jobs:
             cd terraform/
             cat <<EOF > backend.hcl
             organization = "${{ env.organization }}"
-            workspaces { name = "${{ secrets.LICENCEPLATE }}-${{ env.environment }}-ssp-vm" }
+            workspaces { name = "${{ secrets.LICENCEPLATE }}-${{ inputs.environment }}-ssp-vm" }
             
             
             EOF
