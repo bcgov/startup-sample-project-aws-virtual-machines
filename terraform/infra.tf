@@ -1,11 +1,11 @@
 terraform {
   backend "remote" {}
-#   required_providers {
-#     aws = {
-#       source  = "hashicorp/aws"
-#       version = "3.9.0"
-#     }
-#   }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "3.9.0"
+    }
+  }
 }
 
 
@@ -180,16 +180,6 @@ module "asg" {
     },
   ]
 
-}
-
-
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">=3.63.0"
-    }
-  }
 }
 
 resource "aws_iam_instance_profile" "ssp_profile" {
