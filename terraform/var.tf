@@ -5,6 +5,7 @@ variable "target_env" {
 variable "target_aws_account_id" {
   description = "AWS workload account id"
 }
+
 variable "git_url" {
   description = "url of the git repo to clone"
   default     = "github.com/bcgov/startup-sample-project-aws-virtual-machines.git"
@@ -15,11 +16,6 @@ variable "sha" {
   description = "Id of the git commit to checkout"
   type        = string
 }
-variable "target_group_name" {
-  description = "Name of the target group"
-  default     = "sample-target-group-vm"
-  type        = string
-}
 variable "lc_name" {
   description = "Name of the launch configuration"
   default     = "sssp-vm-lc"
@@ -27,7 +23,7 @@ variable "lc_name" {
 }
 variable "iamge_id" {
   description = "id of the ami used"
-  default     = "ami-039b3b8b258de6232"
+  default     = "ami-07b9af865d56e30ac"
   type        = string
 }
 
@@ -69,12 +65,6 @@ variable "iam_profile" {
   type        = string
 }
 
-
-variable "alb_name" {
-  description = "Name of the internal alb"
-  default     = "default"
-  type        = string
-}
 variable "app_port" {
   description = "Port exposed by the docker image to redirect traffic to"
   default     = 8080
@@ -84,7 +74,7 @@ variable "health_check_path" {
 }
 variable "service_names" {
   description = "List of service names to use as subdomains"
-  default     = ["ssp-vm", "startup-app-vm"]
+  default     = ["vm-app", "vm-startup-sample-app"]
   type        = list(string)
 }
 
