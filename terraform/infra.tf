@@ -1,9 +1,3 @@
-terraform {
-  backend "remote" {}
-}
-
-
-
 provider "aws" {
   region = var.aws_region
   assume_role {
@@ -35,10 +29,11 @@ resource "aws_dynamodb_table" "ssp-greetings" {
     type = "S"
   }
 }
-data "aws_alb" "main" {
-  name = var.alb_name
+data "aws_lb" "load_balancer" {
+  tags = {
+    Accelerator = "PBMM"
+  }
 }
-
 # s3 bucket where the images are uploaded
 resource "random_pet" "upload_bucket_name" {
   prefix = "upload-bucket"
@@ -47,13 +42,12 @@ resource "random_pet" "upload_bucket_name" {
 
 resource "aws_s3_bucket" "upload_bucket" {
   bucket        = random_pet.upload_bucket_name.id
-  acl           = "private"
   force_destroy = true
 }
 
 # Redirect all traffic from the ALB to the target group
 data "aws_alb_listener" "front_end" {
-  load_balancer_arn = data.aws_alb.main.id
+  load_balancer_arn = data.aws_lb.load_balancer.arn
   port              = 443
 }
 resource "random_pet" "target_group_name" {
@@ -175,16 +169,6 @@ module "asg" {
     },
   ]
 
-}
-
-
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">=3.63.0"
-    }
-  }
 }
 
 resource "aws_iam_instance_profile" "ssp_profile" {
