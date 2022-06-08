@@ -30,9 +30,7 @@ resource "aws_dynamodb_table" "ssp-greetings" {
   }
 }
 data "aws_lb" "load_balancer" {
-  tags = {
-    Accelerator = "PBMM"
-  }
+  name = "default"
 }
 # s3 bucket where the images are uploaded
 resource "random_pet" "upload_bucket_name" {
