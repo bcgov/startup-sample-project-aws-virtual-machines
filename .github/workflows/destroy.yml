@@ -68,6 +68,6 @@ jobs:
             
             EOF
             
-            terraform init -backend-config=backend.hcl
+            terraform init -backend-config=backend.hcl -input=false
             
-            terraform destroy -auto-approve
+            terraform destroy -auto-approve -input=false

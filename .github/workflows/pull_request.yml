@@ -60,5 +60,5 @@ jobs:
             workspaces { name = "${{ secrets.LICENCEPLATE }}-${{ env.environment }}-ssp-vm" }
             EOF
             
-            terraform init -backend-config=backend.hcl
-            terraform plan
+            terraform init -backend-config=backend.hcl -input=false
+            terraform plan -input=false
