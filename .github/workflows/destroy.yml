@@ -51,7 +51,7 @@ jobs:
             cd terraform/
             cat <<EOF > backend.hcl
             bucket = "${{ secrets.S3_BACKEND_NAME }}"
-            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/serverless-app.tfstate"
+            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/virtual-machine-app.tfstate"
             dynamodb_table = "terraform-remote-state-lock-${{ secrets.LICENCEPLATE }}"
             EOF
             
