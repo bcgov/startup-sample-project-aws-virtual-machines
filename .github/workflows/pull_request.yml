@@ -26,7 +26,10 @@ jobs:
     steps:
       - name: env selector
         id: identify
-        run: if [ ${GITHUB_HEAD_REF} = "main" ];then export github_env='prod'; else export github_env=${GITHUB_HEAD_REF}; fi
+        run: |
+          if [ ${GITHUB_HEAD_REF} = "main" ];then export github_env='prod'; else export github_env=${GITHUB_HEAD_REF}; fi
+          echo "::set-output name=github_env::${github_env}"
+
     outputs:
       github_env: ${{ steps.identify.outputs.github_env }}
 
