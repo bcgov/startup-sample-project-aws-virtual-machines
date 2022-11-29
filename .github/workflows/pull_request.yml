@@ -12,28 +12,41 @@ on:
 env:
   TF_VERSION: 1.0.9
   environment: $GITHUB_BASE_REF
-  organization: bcgov
   GIT_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
   SHA: ${{github.event.pull_request.head.sha}}
   Branch: ${GITHUB_HEAD_REF}
-  
-jobs:
-  build:
 
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  env_selector:
+    runs-on: ubuntu-latest       
+    steps:
+      - name: env selector
+        id: identify
+        run: |
+          if [ ${GITHUB_HEAD_REF} = "main" ];then export github_env='prod'; else export github_env=${GITHUB_HEAD_REF}; fi
+          echo "::set-output name=github_env::${github_env}"
+
+    outputs:
+      github_env: ${{ steps.identify.outputs.github_env }}
+
+  build:
+    needs: env_selector
+    environment: ${{ needs.env_selector.outputs.github_env }}
     runs-on: ubuntu-latest       
     steps:
       - name: prod check 
         if: ${{ github.base_ref == 'main' }}
         run: echo "environment=prod" >> $GITHUB_ENV
     
-    
       - name: checkout the repo and building the Backend    
         uses: actions/checkout@v2    
         
-      
-        
       - name: env name
-        run: echo the will apply on ${{ env.environment }}
+        run: echo the will apply on ${{ needs.env_selector.outputs.github_env }}
         
       - name: setting variables
         run: | 
@@ -42,22 +55,24 @@ jobs:
              sha = "${{ env.SHA }}"
              git_url= "${{ env.GIT_URL }}"
              branch ="${{ env.Branch }}"
-             
+             target_env = "${{ env.environment }}"
              EOF
              
     
-      - uses: hashicorp/setup-terraform@v1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-            terraform_version: ${{ env.TF_VERSION }}
-            cli_config_credentials_token: ${{ secrets.TFC_TEAM_TOKEN }}
+          role-to-assume: ${{ secrets.TERRAFORM_DEPLOY_ROLE_ARN }}
+          aws-region: ca-central-1
 
       - name: Planning startup-sample-project using terraform
         uses: hashicorp/setup-terraform@v1
       - run: |
             cd terraform/
             cat <<EOF > backend.hcl
-            organization = "${{ env.organization }}"
-            workspaces { name = "${{ secrets.LICENCEPLATE }}-${{ env.environment }}-ssp-vm" }
+            bucket = "${{ secrets.S3_BACKEND_NAME }}"
+            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/virtual-machine.tfstate"
+            dynamodb_table = "terraform-remote-state-lock-${{ secrets.LICENCEPLATE }}"
             EOF
             
             terraform init -backend-config=backend.hcl -input=false

@@ -5,37 +5,31 @@ name: Terraform destroy
 on:
   workflow_dispatch:
     inputs:
-      cloud_environment:
-        description: 'which cloud Environment the destroy should takes place'
+      env:
+        description: select the environment to destroy
+        type: environment
         required: true
-        default: 'test' 
-        type: choice
-        options:
-        - dev
-        - test
-        - prod 
     
 env:
   TF_VERSION: 1.0.9
-  environment: ${{ github.event.inputs.cloud_environment }}
-  organization: bcgov
+  environment: ${{ inputs.env }}
   SHA: ${{ github.sha }}
   GIT_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
   
-  
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
   
 jobs:
   build:
-
     runs-on: ubuntu-latest
-        
+    environment: ${{ inputs.env }}
     steps:
       - name: checkout the repo and building the Backend    
         uses: actions/checkout@v2
         
       - name: print cloud_environment
-        run: echo the cloud env is ${{ github.event.inputs.cloud_environment }}
-      
+        run: echo the cloud env is ${{ env.environment }}
       
       - name: setting variables
         run: | 
@@ -43,31 +37,23 @@ jobs:
              cat <<EOF > dev.auto.tfvars
              sha = "${{ env.SHA }}"
              git_url= "${{ env.GIT_URL }}"
+             target_env = "${{ env.environment }}"
              EOF
              
-                                    
-      
-            
-
-    
-      - uses: hashicorp/setup-terraform@v1
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-            terraform_version: ${{ env.TF_VERSION }}
-            cli_config_credentials_token: ${{ secrets.TFC_TEAM_TOKEN }}
+          role-to-assume: ${{ secrets.TERRAFORM_DEPLOY_ROLE_ARN }}
+          aws-region: ca-central-1
             
-          
-            
-
       - name: Destroying startup-sample-project using terraform
         run: |
             cd terraform/
             cat <<EOF > backend.hcl
-            organization = "${{ env.organization }}"
-            workspaces { name = "${{ secrets.LICENCEPLATE }}-${{ env.environment }}-ssp-vm" }
-            
-            
+            bucket = "${{ secrets.S3_BACKEND_NAME }}"
+            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/virtual-machine-app.tfstate"
+            dynamodb_table = "terraform-remote-state-lock-${{ secrets.LICENCEPLATE }}"
             EOF
             
             terraform init -backend-config=backend.hcl -input=false
-            
             terraform destroy -auto-approve -input=false
