@@ -8,7 +8,7 @@ variable "target_aws_account_id" {
 
 variable "git_url" {
   description = "url of the git repo to clone"
-  default     = "github.com/bcgov/startup-sample-project-aws-virtual-machines.git"
+  default     = "github.com/rloisell/startup-sample-project-aws-virtual-machines.git"
   type        = string
 }
 
