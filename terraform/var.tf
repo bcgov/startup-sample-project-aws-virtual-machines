@@ -21,9 +21,10 @@ variable "lc_name" {
   default     = "sssp-vm-lc"
   type        = string
 }
+# A single line comment. 
 variable "iamge_id" {
   description = "id of the ami used"
-  default     = "ami-06e39367bd3bb55a7"
+  default     = "ami-06e39367bd3bb5000"
   type        = string
 }
 
