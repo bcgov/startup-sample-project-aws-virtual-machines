@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest    
     steps:
       - name: checkout the repo and building the Backend    
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       
       - name: Extract branch name
         shell: bash
@@ -40,18 +40,18 @@ jobs:
              EOF
              
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.TERRAFORM_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ vars.TERRAFORM_DEPLOY_ROLE_ARN }}
           aws-region: ca-central-1
             
       - name: Deploying startup-sample-project using terraform
         run: |
             cd terraform/
             cat <<EOF > backend.hcl
-            bucket = "${{ secrets.S3_BACKEND_NAME }}"
-            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/virtual-machine-app.tfstate"
-            dynamodb_table = "terraform-remote-state-lock-${{ secrets.LICENCEPLATE }}"
+            bucket = "${{ vars.S3_BACKEND_NAME }}"
+            key = "${{ vars.LICENCEPLATE }}/${{ env.environment }}/virtual-machine-app.tfstate"
+            dynamodb_table = "terraform-remote-state-lock-${{ vars.LICENCEPLATE }}"
             EOF
             
             terraform init -backend-config=backend.hcl -input=false
