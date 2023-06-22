@@ -28,10 +28,10 @@ jobs:
         id: identify
         run: |
           if [ ${GITHUB_BASE_REF} = "main" ];then export github_env='prod'; else export github_env=${GITHUB_BASE_REF}; fi
-          echo "::set-output name=github_env::${github_env}"
+          echo "name=${github_env}" >> "$GITHUB_ENV"
 
     outputs:
-      github_env: ${{ steps.identify.outputs.github_env }}
+      github_env: ${{ env.name }}
 
   build:
     needs: env_selector
@@ -43,7 +43,7 @@ jobs:
         run: echo "environment=prod" >> $GITHUB_ENV
     
       - name: checkout the repo and building the Backend    
-        uses: actions/checkout@v2    
+        uses: actions/checkout@v3    
         
       - name: env name
         run: echo the will apply on ${{ needs.env_selector.outputs.github_env }}
@@ -60,19 +60,19 @@ jobs:
              
     
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.TERRAFORM_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ vars.TERRAFORM_DEPLOY_ROLE_ARN }}
           aws-region: ca-central-1
 
       - name: Planning startup-sample-project using terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
       - run: |
             cd terraform/
             cat <<EOF > backend.hcl
-            bucket = "${{ secrets.S3_BACKEND_NAME }}"
-            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/virtual-machine.tfstate"
-            dynamodb_table = "terraform-remote-state-lock-${{ secrets.LICENCEPLATE }}"
+            bucket = "${{ vars.S3_BACKEND_NAME }}"
+            key = "${{ vars.LICENCEPLATE }}/${{ env.environment }}/virtual-machine.tfstate"
+            dynamodb_table = "terraform-remote-state-lock-${{ vars.LICENCEPLATE }}"
             EOF
             
             terraform init -backend-config=backend.hcl -input=false

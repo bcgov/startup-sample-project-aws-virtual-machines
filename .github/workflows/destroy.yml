@@ -26,7 +26,7 @@ jobs:
     environment: ${{ inputs.env }}
     steps:
       - name: checkout the repo and building the Backend    
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
       - name: print cloud_environment
         run: echo the cloud env is ${{ env.environment }}
@@ -41,18 +41,18 @@ jobs:
              EOF
              
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.TERRAFORM_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ vars.TERRAFORM_DEPLOY_ROLE_ARN }}
           aws-region: ca-central-1
             
       - name: Destroying startup-sample-project using terraform
         run: |
             cd terraform/
             cat <<EOF > backend.hcl
-            bucket = "${{ secrets.S3_BACKEND_NAME }}"
-            key = "${{ secrets.LICENCEPLATE }}/${{ env.environment }}/virtual-machine-app.tfstate"
-            dynamodb_table = "terraform-remote-state-lock-${{ secrets.LICENCEPLATE }}"
+            bucket = "${{ vars.S3_BACKEND_NAME }}"
+            key = "${{ vars.LICENCEPLATE }}/${{ env.environment }}/virtual-machine-app.tfstate"
+            dynamodb_table = "terraform-remote-state-lock-${{ vars.LICENCEPLATE }}"
             EOF
             
             terraform init -backend-config=backend.hcl -input=false

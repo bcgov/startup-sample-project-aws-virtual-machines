@@ -109,7 +109,7 @@ resource "random_pet" "instances_name" {
 /* Auto Scaling & Launch Configuration */
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 4.0"
+  version = "5.0.0"
 
   name = random_pet.instances_name.id
 
@@ -153,16 +153,6 @@ module "asg" {
     }
     triggers = ["tag"]
   }
-
-
-
-  tags = [
-    {
-      key                 = "Environment"
-      value               = "dev"
-      propagate_at_launch = true
-    },
-  ]
 
 }
 
