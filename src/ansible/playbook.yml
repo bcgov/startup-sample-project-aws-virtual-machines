@@ -1,0 +1,97 @@
+---
+- hosts: localhost
+  become: yes
+
+  tasks:
+    - name: install curl
+      yum:
+        name: curl
+        state: present
+
+    - name: install epel
+      become: yes
+      shell: amazon-linux-extras install epel
+
+    - name: install nginx
+      become: yes
+      shell: amazon-linux-extras install nginx1
+
+    - name: downloading node.js
+      become: yes
+      become_user: ec2-user
+      shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+
+    - name: activate nvm and install nodejs
+      become: yes
+      become_user: ec2-user
+      shell: |
+        source ~/.nvm/nvm.sh
+        nvm install lts/fermium
+        nvm use lts/fermium
+
+    - name: Copy nginx config files
+      copy:
+        src: "./files/nginx.conf"
+        dest: "/etc/nginx/nginx.conf"
+        mode: 0644
+
+    - name: Update client nginx config
+      copy:
+        src: "./files/web.conf"
+        dest: "/etc/nginx/conf.d/web.conf"
+        mode: 0644
+
+    - name: Enable and Restart Nginx
+      become: yes
+      service:
+        name: nginx
+        enabled: yes
+        state: restarted
+
+    - name: Open Port 8080 from instance firewall
+      become: yes
+      shell: iptables -I INPUT 3 -s 0.0.0.0/0 -d 0.0.0.0/0 -p tcp --dport 8080 -m state --state New -j ACCEPT
+
+    - name: SELinux denied permission to make outgoing network connections
+      become: yes
+      shell: setsebool -P httpd_can_network_connect 1
+
+    - name: Installing the Backend Dependencies
+      become: yes
+      become_user: ec2-user
+      shell: source /home/ec2-user/.nvm/nvm.sh && nvm use lts/fermium && npm install
+      args:
+        chdir: /home/ec2-user/repos/backend/src/api
+
+    - name: Create systemd service file for Greetings API
+      become: yes
+      copy:
+        content: |
+          [Unit]
+          Description=Greetings API Service
+          After=network.target
+
+          [Service]
+          WorkingDirectory=/home/ec2-user/repos/backend/src/api
+          ExecStart=/bin/bash -c "source /home/ec2-user/.nvm/nvm.sh && nvm use lts/fermium && npm start"
+          User=ec2-user
+          Group=ec2-user
+          Restart=always
+          Environment=NODE_ENV=production
+          Environment=DYNAMODB_TABLE_NAME={{ dynamodb_table_name }}
+          Environment=AWS_REGION={{ aws_region }}
+          StandardOutput=syslog
+          StandardError=syslog
+          SyslogIdentifier=greetings-api
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/greetings-api.service
+
+    - name: Installing the backend as a service
+      become: yes
+      systemd:
+        name: greetings-api
+        daemon_reload: yes
+        enabled: yes
+        state: started
