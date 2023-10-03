@@ -78,7 +78,7 @@ variable "app_port" {
 }
 
 variable "health_check_path" {
-  default = "/"
+  default = "/api/v1/greeting/latest"
 }
 
 variable "common_tags" {

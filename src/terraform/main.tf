@@ -226,7 +226,7 @@ module "asg" {
 
   # Auto scaling group creation
   vpc_zone_identifier       = module.network.aws_subnet_ids.app.ids
-  health_check_type         = "EC2"
+  health_check_type         = "ELB"
   min_size                  = 1
   max_size                  = 1
   desired_capacity          = 1
