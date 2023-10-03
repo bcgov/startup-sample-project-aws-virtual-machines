@@ -31,7 +31,7 @@ jobs:
 
       - name: setting variables
         run: |
-          cd terraform/
+          cd src/terraform/
           cat <<EOF > prod.auto.tfvars
           sha = "${{ env.SHA }}"
           git_url= "${{ env.GIT_URL }}"
@@ -47,7 +47,7 @@ jobs:
 
       - name: Deploying startup-sample-project using terraform
         run: |
-          cd terraform/
+          cd src/terraform/
           cat <<EOF > backend.hcl
           bucket = "${{ vars.S3_BACKEND_NAME }}"
           key = "virtual-machine-app.tfstate"
