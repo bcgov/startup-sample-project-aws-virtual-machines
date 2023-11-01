@@ -192,7 +192,7 @@ data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
     git_url    = var.git_url
-    sha        = var.sha
+    # sha        = var.sha
     DB_NAME    = aws_dynamodb_table.ssp-greetings.id
     branch     = var.branch
     AWS_REGION = var.aws_region

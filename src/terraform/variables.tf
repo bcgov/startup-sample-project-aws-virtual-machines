@@ -10,14 +10,15 @@ variable "target_env" {
 
 variable "git_url" {
   description = "url of the git repo to clone"
-  default     = "github.com/bcgov/startup-sample-project-aws-virtual-machines.git"
+  default     = "https://github.com/bcgov/bcparks-dam.git"
   type        = string
 }
 
-variable "sha" {
-  description = "Id of the git commit to checkout"
-  type        = string
-}
+# variable "sha" {
+#  description = "Id of the git commit to checkout"
+#  type        = string
+# }
+
 variable "lc_name" {
   description = "Name of the launch configuration"
   default     = "ssp-vm-lc"
