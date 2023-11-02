@@ -1,6 +1,6 @@
 variable "app_name" {
   description = "Name of the application"
-  default     = "startup-sample-app-vm"
+  default     = "bcparks-dam-vm"
   type        = string
 }
 
@@ -8,89 +8,54 @@ variable "target_env" {
   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
 }
 
-variable "git_url" {
-  description = "url of the git repo to clone"
-  default     = "https://github.com/bcgov/bcparks-dam.git"
-  type        = string
-}
-
-# variable "sha" {
-#  description = "Id of the git commit to checkout"
-#  type        = string
-# }
-
 variable "lc_name" {
   description = "Name of the launch configuration"
-  default     = "ssp-vm-lc"
+  default     = "dam-vm-lc"
   type        = string
 }
 
-variable "iamge_id" {
+variable "image_id" {
   description = "id of the ami used"
-  default     = "ami-07b9af865d56e30ac"
+  default     = "ami-03e6e252d463d4bfc"
   type        = string
 }
 
 variable "asg_name" {
   description = "name of the autoscaling group created"
-  default     = "ssp-vm-asg"
-  type        = string
-}
-
-variable "branch" {
-  description = "name of the autoscaling group created"
-  default     = "main"
-  type        = string
-}
-
-variable "table_name" {
-  description = "name of the dynamodb table created"
-  default     = "ssp-greetings-vm"
-  type        = string
-}
-
-variable "instances_name" {
-  description = "name of the asg instances created"
-  default     = "asg-instances"
-  type        = string
-}
-
-variable "policy_name" {
-  description = "name of the policy created"
-  default     = "ssp_db"
-  type        = string
-}
-
-variable "role_name" {
-  description = "name of the role created"
-  default     = "ssp-db"
-  type        = string
-}
-
-variable "iam_profile" {
-  description = "name of the IAM profile created"
-  default     = "ssp_profile"
+  default     = "dam-vm-asg"
   type        = string
 }
 
 variable "app_port" {
-  description = "Port exposed by the docker image to redirect traffic to"
-  default     = 8080
+  description = "Port exposed by the VM image to redirect traffic to"
+  default     = 80
 }
 
 variable "health_check_path" {
-  default = "/api/v1/greeting/latest"
+  default = "/login.php"
 }
 
 variable "common_tags" {
   description = "Common tags for created resources"
   default = {
-    Application = "Startup Sample"
+    Application = "BCParks DAM"
   }
 }
 
 variable "aws_region" {
   description = "region of the aws"
   default     = "ca-central-1"
+  type        = string
+}
+
+variable "service_names" {
+  description = "List of service names to use as subdomains"
+  default     = ["dam"]
+  type        = list(string)
+}
+
+variable "alb_name" {
+  description = "Name of the internal alb"
+  default     = "default"
   type        = string
 }

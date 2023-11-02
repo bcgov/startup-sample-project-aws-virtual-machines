@@ -10,10 +10,10 @@ generate "remote_state" {
   contents  = <<EOF
 terraform {
   backend "s3" {
-    bucket         = "terraform-remote-state-lqc63d-${local.target_env}"
+    bucket         = "bcparks-dam-${local.target_env}-terraform-remote-state"
     key            = "remote.tfstate-admin"                # Path and name of the state file within the bucket
     region         = "ca-central-1"                        # AWS region where the bucket is located
-    dynamodb_table = "terraform-remote-state-lock-lqc63d"  # Replace with either generated or custom DynamoDB table name
+    dynamodb_table = "bcparks-dam-${local.target_env}-terraform-remote-state-lock"  # Replace with either generated or custom DynamoDB table name
     encrypt        = true                                  # Enable encryption for the state file
   }
 }
