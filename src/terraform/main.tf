@@ -49,6 +49,9 @@ resource "aws_alb_target_group" "app" {
 data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
+    git_url    = var.git_url
+    sha        = var.sha
+    branch     = var.branch
     AWS_REGION = var.aws_region
   }
 }
@@ -64,7 +67,7 @@ module "asg" {
   # Launch configuration creation
   lc_name                   = var.lc_name
   image_id                  = var.image_id
-  instance_type             = "t2.micro"
+  instance_type             = "t3.micro"
   spot_price                = "0.0038"
   security_groups           = [module.network.aws_security_groups.app.id]
   user_data                 = data.template_file.userdata_script.rendered

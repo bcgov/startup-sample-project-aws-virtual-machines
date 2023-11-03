@@ -8,6 +8,24 @@ variable "target_env" {
   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
 }
 
+variable "git_url" {
+  description = "url of the git repo to clone the ansible files"
+  default     = "https://github.com/bcgov/bcparks-dam.git"
+  type        = string
+}
+
+variable "sha" {
+  description = "Id of the git commit to checkout the ansible files"
+  default     = "ABC123ABC123"
+  type        = string
+}
+
+variable "branch" {
+  description = "GitHub branch containing the ansible files"
+  default     = "main"
+  type        = string
+}
+
 variable "lc_name" {
   description = "Name of the launch configuration"
   default     = "dam-vm-lc"
