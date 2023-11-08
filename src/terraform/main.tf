@@ -67,6 +67,7 @@ module "asg" {
   image_id                  = var.image_id
   security_groups           = [module.network.aws_security_groups.web.id]
   instance_type             = "t3a.small"
+  iam_instance_profile_name = aws_iam_instance_profile.dam_ec2_profile.name
   user_data                 = data.template_file.userdata_script.rendered
   use_lc                    = true
   create_lc                 = true
@@ -112,6 +113,63 @@ resource "aws_lb_listener_rule" "host_based_weighted_routing" {
   }
 }
 
-resource "aws_s3_bucket" "dam_s3" {
+resource "aws_s3_bucket" "dam_s3_bucket" {
   bucket = "bcparks-dam-${var.target_env}-images"
+}
+
+resource "aws_iam_policy" "s3_policy" {
+	name        = "BCParks-Dam-S3-Access"
+	path        = "/"
+  description = "Allow access S3 bucket bcparks-dam-${var.target_env}-images"
+	policy      = jsonencode(
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": ["s3:ListBucket"],
+          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-images"]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject",
+            "s3:GetObjectAttributes"
+          ],
+          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-images/*"]
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_role" "ec2_role" {
+  name               = "BCParks-Dam-EC2-Role"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "dam_ec2_profile" {
+  name = "BCParks-Dam-EC2-ip"
+  role = aws_iam_role.ec2_role.name
+}
+
+resource "aws_iam_policy_attachment" "dam_ec2_attach" {
+  name       = "dam-s3-policy-attachment"
+  roles      = [aws_iam_role.ec2_role.name]
+  policy_arn = aws_iam_policy.s3_policy.arn
 }
