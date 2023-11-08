@@ -50,8 +50,6 @@ data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
     git_url    = var.git_url
-    sha        = var.sha
-    branch     = var.branch
     AWS_REGION = var.aws_region
   }
 }
@@ -67,16 +65,15 @@ module "asg" {
   # Launch configuration creation
   lc_name                   = var.lc_name
   image_id                  = var.image_id
-  instance_type             = "t3.micro"
-  spot_price                = "0.0038"
-  security_groups           = [module.network.aws_security_groups.app.id]
+  security_groups           = [module.network.aws_security_groups.web.id]
+  instance_type             = "t3a.small"
   user_data                 = data.template_file.userdata_script.rendered
   use_lc                    = true
   create_lc                 = true
 
   root_block_device = [
     {
-      volume_size = "50"
+      volume_size = "10"
       volume_type = "gp2"
     },
   ]
@@ -113,4 +110,8 @@ resource "aws_lb_listener_rule" "host_based_weighted_routing" {
       values = [for sn in var.service_names : "${sn}.*"]
     }
   }
+}
+
+resource "aws_s3_bucket" "dam_s3" {
+  bucket = "bcparks-dam-${var.target_env}-images"
 }

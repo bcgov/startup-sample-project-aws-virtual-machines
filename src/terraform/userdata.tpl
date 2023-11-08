@@ -1,12 +1,17 @@
 #! /bin/bash
 
-sudo -u ec2-user mkdir -p /home/ec2-user/repos
-cd /home/ec2-user/repos
-sudo yum update -y
-sudo yum install -y libselinux-python policycoreutils-python git
-sudo yum install ec2-instance-connect
-sudo amazon-linux-extras install ansible2 -y
-sudo -u ec2-user git clone -b ${branch} ${git_url} backend
-git checkout ${sha}
-cd /home/ec2-user/repos/backend/src/ansible
-ansible-playbook playbook.yml -e "dynamodb_table_name=DB_NAME" -e "aws_region=${AWS_REGION}"
+# install SSM agent to allow access from the Session Manager web interface
+mkdir /tmp/ssm
+cd /tmp/ssm
+wget -q https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+sudo dpkg -i amazon-ssm-agent.deb
+
+# download the files from our git repo to complete the ansible config
+sudo -u bitnami mkdir -p /home/bitnami/repos
+cd /home/bitnami/repos
+sudo apt update -y
+sudo apt-get install git -y
+sudo apt-get install ansible -y
+sudo -u bitnami git clone ${git_url} bcparks-dam
+cd /home/bitnami/repos/bcparks-dam/src/ansible
+# ansible-playbook playbook.yml -e "dynamodb_table_name=DB_NAME" -e "aws_region=${AWS_REGION}"
