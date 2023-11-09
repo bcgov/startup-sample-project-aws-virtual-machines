@@ -40,7 +40,7 @@ resource "aws_alb_target_group" "app" {
     matcher             = "200"
     timeout             = "3"
     path                = var.health_check_path
-    unhealthy_threshold = "2"
+    unhealthy_threshold = "10"
   }
 
   tags = var.common_tags
@@ -50,7 +50,8 @@ data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
     git_url    = var.git_url
-    AWS_REGION = var.aws_region
+    target_env = var.target_env
+    aws_region = var.aws_region
   }
 }
 
@@ -114,13 +115,15 @@ resource "aws_lb_listener_rule" "host_based_weighted_routing" {
 }
 
 resource "aws_s3_bucket" "dam_s3_bucket" {
-  bucket = "bcparks-dam-${var.target_env}-images"
+  bucket = "bcparks-dam-${var.target_env}-backup"
+  tags   = var.common_tags
 }
 
 resource "aws_iam_policy" "s3_policy" {
 	name        = "BCParks-Dam-S3-Access"
 	path        = "/"
-  description = "Allow access S3 bucket bcparks-dam-${var.target_env}-images"
+  description = "Allow access S3 bucket bcparks-dam-${var.target_env}-backup"
+  tags        = var.common_tags
 	policy      = jsonencode(
     {
       "Version": "2012-10-17",
@@ -128,17 +131,28 @@ resource "aws_iam_policy" "s3_policy" {
         {
           "Effect": "Allow",
           "Action": ["s3:ListBucket"],
-          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-images"]
+          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-backup"]
         },
         {
           "Effect": "Allow",
-          "Action": [
-            "s3:PutObject",
-            "s3:GetObject",
-            "s3:DeleteObject",
-            "s3:GetObjectAttributes"
-          ],
-          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-images/*"]
+          "Action": ["s3:*"],
+          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-backup/*"]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AttachVolume",
+                "ec2:DetachVolume"
+            ],
+            "Resource": "arn:aws:ec2:*:*:instance/*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:AttachVolume",
+                "ec2:DetachVolume"
+            ],
+            "Resource": "arn:aws:ec2:*:*:volume/*"
         }
       ]
     }
@@ -147,6 +161,7 @@ resource "aws_iam_policy" "s3_policy" {
 
 resource "aws_iam_role" "ec2_role" {
   name               = "BCParks-Dam-EC2-Role"
+  tags               = var.common_tags
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -166,6 +181,7 @@ EOF
 resource "aws_iam_instance_profile" "dam_ec2_profile" {
   name = "BCParks-Dam-EC2-ip"
   role = aws_iam_role.ec2_role.name
+  tags = var.common_tags
 }
 
 resource "aws_iam_policy_attachment" "dam_ec2_attach" {
