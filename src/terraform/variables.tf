@@ -1,8 +1,4 @@
-variable "app_name" {
-  description = "Name of the application"
-  default     = "bcparks-dam-vm"
-  type        = string
-}
+# variables.tf
 
 variable "target_env" {
   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"

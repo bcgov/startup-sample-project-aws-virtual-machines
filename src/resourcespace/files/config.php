@@ -69,18 +69,3 @@ $comments_resource_enable=true;
 $api_upload_urls = array();
 
 $use_native_input_for_date_field = true;
-
-# MySQL database settings
-# $mysql_server = '127.0.0.1:3306';
-# $mysql_username = '';
-# $mysql_password = '';
-# $mysql_db = '';
-
-# Email settings
-# $email_notify = '';
-# $email_from = '';
-
-# Secure keys
-# $spider_password = '';
-# $scramble_key = '';
-# $api_scramble_key = '';

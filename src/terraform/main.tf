@@ -1,14 +1,7 @@
+# main.tf
+
 provider "aws" {
   region = var.aws_region
-}
-
-data "aws_caller_identity" "current" {}
-
-# Gather VPC information from the network module
-
-module "network" {
-  source      = "git::https://github.com/BCDevOps/terraform-octk-aws-sea-network-info.git//?ref=master"
-  environment = var.target_env
 }
 
 # Internal ALB 
@@ -26,7 +19,7 @@ data "aws_alb_listener" "web" {
 }
 
 resource "aws_alb_target_group" "app" {
-  name                 = var.app_name
+  name                 = "bcparks-dam-vm"
   port                 = var.app_port
   protocol             = "HTTP"
   vpc_id               = module.network.aws_vpc.id
@@ -49,9 +42,18 @@ resource "aws_alb_target_group" "app" {
 data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
-    git_url    = var.git_url
-    target_env = var.target_env
-    aws_region = var.aws_region
+    git_url          = var.git_url
+    target_env       = var.target_env
+    aws_region       = var.aws_region
+    rds_endpoint     = aws_rds_cluster.mysql.endpoint
+    efs_dns_name     = aws_efs_file_system.efs_filestore.dns_name
+    mysql_username   = local.secrets.mysql_username
+    mysql_password   = local.secrets.mysql_password
+    email_notify     = local.secrets.email_notify
+    email_from       = local.secrets.email_from
+    spider_password  = local.secrets.spider_password
+    scramble_key     = local.secrets.scramble_key
+    api_scramble_key = local.secrets.api_scramble_key
   }
 }
 
@@ -60,7 +62,7 @@ module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "5.0.0"
 
-  name = var.app_name
+  name = "bcparks-dam-vm"
   tags = var.common_tags
 
   # Launch configuration creation
@@ -68,7 +70,7 @@ module "asg" {
   image_id                  = var.image_id
   security_groups           = [module.network.aws_security_groups.web.id]
   instance_type             = "t3a.small"
-  iam_instance_profile_name = aws_iam_instance_profile.dam_ec2_profile.name
+  iam_instance_profile_name = aws_iam_instance_profile.ec2_profile.name
   user_data                 = data.template_file.userdata_script.rendered
   use_lc                    = true
   create_lc                 = true
@@ -112,80 +114,4 @@ resource "aws_lb_listener_rule" "host_based_weighted_routing" {
       values = [for sn in var.service_names : "${sn}.*"]
     }
   }
-}
-
-resource "aws_s3_bucket" "dam_s3_bucket" {
-  bucket = "bcparks-dam-${var.target_env}-backup"
-  tags   = var.common_tags
-}
-
-resource "aws_iam_policy" "s3_policy" {
-	name        = "BCParks-Dam-S3-Access"
-	path        = "/"
-  description = "Allow access S3 bucket bcparks-dam-${var.target_env}-backup"
-  tags        = var.common_tags
-	policy      = jsonencode(
-    {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-          "Effect": "Allow",
-          "Action": ["s3:ListBucket"],
-          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-backup"]
-        },
-        {
-          "Effect": "Allow",
-          "Action": ["s3:*"],
-          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-backup/*"]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AttachVolume",
-                "ec2:DetachVolume"
-            ],
-            "Resource": "arn:aws:ec2:*:*:instance/*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:AttachVolume",
-                "ec2:DetachVolume"
-            ],
-            "Resource": "arn:aws:ec2:*:*:volume/*"
-        }
-      ]
-    }
-  )
-}
-
-resource "aws_iam_role" "ec2_role" {
-  name               = "BCParks-Dam-EC2-Role"
-  tags               = var.common_tags
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_instance_profile" "dam_ec2_profile" {
-  name = "BCParks-Dam-EC2-ip"
-  role = aws_iam_role.ec2_role.name
-  tags = var.common_tags
-}
-
-resource "aws_iam_policy_attachment" "dam_ec2_attach" {
-  name       = "dam-s3-policy-attachment"
-  roles      = [aws_iam_role.ec2_role.name]
-  policy_arn = aws_iam_policy.s3_policy.arn
 }

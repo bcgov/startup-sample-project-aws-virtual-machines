@@ -12,26 +12,37 @@ wget -q https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_am
 sudo dpkg -i amazon-ssm-agent.deb
 
 
-# MOUNT THE EBS PERISTENT VOLUME
-# This volume contains the resourcespace filestore. We tried using S3 but it was slow and unreliable.
-# Note that this volume has to be attached and mounted in a script. Mounting a volume to a scalable launch 
-# configuration is not supported by terraform (you can only connect a volume to a single instance in Terrafom).
+# INSTALL AMAZON-EFS-UTILS
+# We need to build this from source for Debian Linux. It isn't avaialble otherwise
 #
-echo '### Mounting the EBS persistent volume ###'
+echo '### Installing amazon-efs-utils ###'
 sudo apt update -y
-sudo apt-get install awscli -y
-EC2_INSTANCE_ID="`wget -q -O - http://169.254.169.254/latest/meta-data/instance-id`"
-ECS_VOLUME_ID="`aws ec2 describe-volumes --region ca-central-1 --filters Name=tag:Name,Values="ResourceSpace filestore" --query "Volumes[*].{ID:VolumeId}" --output text`"
-aws ec2 attach-volume --volume-id $ECS_VOLUME_ID --instance-id $EC2_INSTANCE_ID --device "/dev/sdf" --region="ca-central-1"
-sleep 2
-sudo mount -t auto -v /dev/sdf /opt/bitnami/resourcespace/filestore  # replace the default filestore folder
+sudo apt-get install git binutils -y
+sudo -u bitnami mkdir -p /home/bitnami/repos
+cd /home/bitnami/repos
+sudo -u bitnami git clone https://github.com/aws/efs-utils efs-utils
+cd efs-utils
+sudo -u bitnami ./build-deb.sh
+sudo apt-get -y install ./build/amazon-efs-utils*deb
+
+
+# MOUNT THE EFS PERISTENT FILESYSTEM
+# This volume contains the resourcespace filestore. We tried using S3 but it was slow and unreliable.
+# EBS wouldn't work either because the autoscaling group runs in 2 availability zones.  
+#
+echo '### Mounting the EFS filesystem ###'
+cd /opt/bitnami/resourcespace
+sudo cp -r filestore filestore.old
+sudo mount -t efs -o iam -o tls ${efs_dns_name}:/ ./filestore
+sudo chown -R bitnami:daemon filestore
+sudo chmod -R 775 filestore
 
 
 # MOUNT THE S3 BUCKET
 # The S3 bucket /mnt/s3-backup is used for backups and file transfers. You can use
 # the AWS web console to upload and download data into this bucket from your computer.
 #
-echo "### Mounting the S3 bucket ###"
+echo '### Mounting the S3 bucket ###'
 sudo apt-get install s3fs -y
 sudo mkdir /mnt/s3-backup
 sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Dam-EC2-Role -o use_cache=/tmp -o allow_other -o uid=0 -o gid=1 -o mp_umask=002  -o multireq_max=5 -o use_path_request_style -o url=https://s3-${aws_region}.amazonaws.com
@@ -40,38 +51,32 @@ sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Da
 # CUSTOMIZE THE BITNAMI RESOURCESPACE CONFIG
 # Download all the files from our git repo to get our customized copy of config.php
 #
-echo '### Customizing the Bitnami Resourcespace config ###`
-sudo -u bitnami mkdir -p /home/bitnami/repos
+echo '### Customizing the Bitnami Resourcespace config ###'
 cd /home/bitnami/repos
-sudo apt-get install git -y
 sudo -u bitnami git clone ${git_url} bcparks-dam
-# TODO: copy the config.php file to overwrite the resourcespace config
-# TODO: use values from AWS secrets manager secrets to append settings to the file 
 
+# use values from AWS secrets manager secrets to append settings to the file 
+tee -a bcparks-dam/src/resourcespace/files/config.php << END
 
+# MySQL database settings
+\$mysql_server = '${rds_endpoint}:3306';
+\$mysql_username = '${mysql_username}';
+\$mysql_password = '${mysql_password}';
+\$mysql_db = 'resourcespace';
 
-# MY WORKING NOTES ARE BELOW THIS LINE
+# Email settings
+\$email_notify = '${email_notify}';
+\$email_from = '${email_from}';
 
-# just complete the steps below once during setup (need to figure out how to check if it's already done to automate it)
+# Secure keys
+\$spider_password = '${spider_password}';
+\$scramble_key = '${scramble_key}';
+\$api_scramble_key = '${api_scramble_key}';
 
-# 1. create the volume from the gui with the name 'ResourceSpace filestore'
-#     -- 10GB / gp2 / default settings (you can make it bigger later from the web interface)
-#     -- for some reason Terraform permissions won't allow us to create it
-#
-# 2. run the commands below after the volume is created
-#   cd /opt/bitnami/resourcespace
-#   sudo umount /opt/bitnami/resourcespace/filestore
-#   sudo cp -r filestore filestore.old
-#   sudo mkfs.ext4 /dev/sdf
-#   sudo mount -t auto -v /dev/sdf /opt/bitnami/resourcespace/filestore
-#   sudo cp -R filestore.old/* filestore
-#   sudo rm -rf filestore.old
-#   sudo chown -R bitnami:daemon filestore
-#   sudo chmod -R 775 filestore
+END
 
-
-# command to back up the database so we can restore it onto RDS
-# /opt/bitnami/mariadb/bin/mariadb-dump -u bn_resourcespace -p<password> bitnami_resourcespace > /mnt/s3-backup/resourcespace.sql
-
-# command to restart ResoureSpace
-# sudo /opt/bitnami/ctlscript.sh restart
+## copy the config.php file to overwrite the resourcespace config
+cd /home/bitnami/repos/bcparks-dam/src/resourcespace/files
+sudo cp config.php /opt/bitnami/resourcespace/include
+sudo chown bitnami:daemon /opt/bitnami/resourcespace/include/config.php
+sudo chmod 664 /opt/bitnami/resourcespace/include/config.php
