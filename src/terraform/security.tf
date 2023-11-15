@@ -84,3 +84,57 @@ resource "aws_iam_policy_attachment" "ec2_efs_attach" {
   roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.efs_policy.arn
 }
+
+resource "aws_efs_file_system_policy" "efs_policy" {
+  file_system_id = aws_efs_file_system.efs_filestore.id
+  bypass_policy_lockout_safety_check = true
+  policy = jsonencode(
+  {
+    "Version": "2012-10-17",
+    "Id": "ExamplePolicy01",
+    "Statement": [
+        {            
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "${aws_iam_role.ec2_role.arn}"
+            },
+            "Resource": "${aws_efs_file_system.efs_filestore.arn}",
+            "Action": [
+                "elasticfilesystem:ClientMount",
+                "elasticfilesystem:ClientWrite",
+                "elasticfilesystem:ClientRootAccess"
+            ],
+            "Condition": {
+                "Bool": {
+                    "aws:SecureTransport": "true"
+                }
+            }
+        }
+      ]
+    }
+  )
+}
+
+resource "aws_iam_policy" "s3_policy" {
+	name        = "BCParks-Dam-S3-Access"
+	path        = "/"
+  description = "Allow access S3 bucket bcparks-dam-${var.target_env}-backup"
+  tags        = var.common_tags
+	policy      = jsonencode(
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": ["s3:ListBucket"],
+          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-backup"]
+        },
+        {
+          "Effect": "Allow",
+          "Action": ["s3:*"],
+          "Resource": ["arn:aws:s3:::bcparks-dam-${var.target_env}-backup/*"]
+        }
+      ]
+    }
+  )
+}

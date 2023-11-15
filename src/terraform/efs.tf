@@ -52,38 +52,6 @@ resource "aws_efs_mount_target" "data_azB" {
   security_groups = [aws_security_group.efs_security_group.id]
 }
 
-resource "aws_efs_file_system_policy" "efs_policy" {
-  file_system_id = aws_efs_file_system.efs_filestore.id
-
-  bypass_policy_lockout_safety_check = true
-
-  policy = <<POLICY
-{
-    "Version": "2012-10-17",
-    "Id": "ExamplePolicy01",
-    "Statement": [
-        {            
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "${aws_iam_role.ec2_role.arn}"
-            },
-            "Resource": "${aws_efs_file_system.efs_filestore.arn}",
-            "Action": [
-                "elasticfilesystem:ClientMount",
-                "elasticfilesystem:ClientWrite",
-                "elasticfilesystem:ClientRootAccess"
-            ],
-            "Condition": {
-                "Bool": {
-                    "aws:SecureTransport": "true"
-                }
-            }
-        }
-    ]
-}
-POLICY
-}
-
 resource "aws_efs_access_point" "filestore" {
   file_system_id = aws_efs_file_system.efs_filestore.id
   posix_user {

@@ -75,8 +75,10 @@ tee -a bcparks-dam/src/resourcespace/files/config.php << END
 
 END
 
-## copy the config.php file to overwrite the resourcespace config
+## copy the customized config.php file to overwrite the resourcespace config
+cd /opt/bitnami/resourcespace/include
+sudo mv config.php config.php.old
 cd /home/bitnami/repos/bcparks-dam/src/resourcespace/files
-sudo cp config.php /opt/bitnami/resourcespace/include
-sudo chown bitnami:daemon /opt/bitnami/resourcespace/include/config.php
-sudo chmod 664 /opt/bitnami/resourcespace/include/config.php
+sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/config.php .
+sudo chown bitnami:daemon config.php
+sudo chmod 664 config.php
