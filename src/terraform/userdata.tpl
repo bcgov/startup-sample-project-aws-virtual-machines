@@ -32,10 +32,10 @@ sudo apt-get -y install ./build/amazon-efs-utils*deb
 #
 echo '### Mounting the EFS filesystem ###'
 cd /opt/bitnami/resourcespace
-sudo cp -r filestore filestore.old
+sudo cp -R filestore filestore.bitnami
 sudo mount -t efs -o iam -o tls ${efs_dns_name}:/ ./filestore
-sudo chown -R bitnami:daemon filestore
-sudo chmod -R 775 filestore
+sudo chown -R bitnami:daemon filestore*
+sudo chmod -R 775 filestore*
 
 
 # MOUNT THE S3 BUCKET
@@ -77,8 +77,13 @@ END
 
 ## copy the customized config.php file to overwrite the resourcespace config
 cd /opt/bitnami/resourcespace/include
-sudo mv config.php config.php.old
-cd /home/bitnami/repos/bcparks-dam/src/resourcespace/files
+sudo cp config.php config.php.bitnami
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/config.php .
 sudo chown bitnami:daemon config.php
 sudo chmod 664 config.php
+
+
+# CLEAR THE TMP FOLDER
+#
+echo '### Clear the tmp folder ###'
+sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
