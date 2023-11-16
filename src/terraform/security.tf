@@ -88,8 +88,8 @@ resource "aws_iam_policy_attachment" "ec2_efs_attach" {
 resource "aws_efs_file_system_policy" "efs_policy" {
   file_system_id = aws_efs_file_system.efs_filestore.id
   bypass_policy_lockout_safety_check = true
-  policy = jsonencode(
-  {
+  policy = <<POLICY
+{
     "Version": "2012-10-17",
     "Id": "ExamplePolicy01",
     "Statement": [
@@ -110,9 +110,13 @@ resource "aws_efs_file_system_policy" "efs_policy" {
                 }
             }
         }
-      ]
-    }
-  )
+    ]
+}
+POLICY
+  depends_on = [
+    aws_iam_role.ec2_role,
+    aws_efs_file_system.efs_filestore
+  ]
 }
 
 resource "aws_iam_policy" "s3_policy" {
