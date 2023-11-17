@@ -47,9 +47,9 @@ Use the `$mysql_password` variable value from above for the `<local_password>`.
 ```
 
 ### Restore the database onto RDS
-The rds_password and host name are in the AWS Secrets Manager in "rds-db-credentials"
+The mysql_password and host name can be found in the config.php file.
 ```
-/opt/bitnami/mariadb/bin/mysql --host=<host_name of rds endpoint> --user=admin --password=<rds_passowrd> resourcespace <  /mnt/s3-backup/resourcespace.sql
+/opt/bitnami/mariadb/bin/mysql --host=<host_name of rds endpoint> --user=admin --password=<mysql_password> resourcespace <  /mnt/s3-backup/resourcespace.sql
 ```
 
 ### Run the commands below to copy the default filestore data
@@ -69,6 +69,8 @@ There is an S3 bucket called `bcparks-dam-dev-backup` which is accessible from t
 ## Debugging tips
 
 ResourceSpace errors are in `/opt/bitnami/apache2/logs/error_log`
+
+There is an activity log in the "Auto Scaling Groups" in the AWS web console.  If your EC2 instance isn't starting then this is a good place to look.
 
 ### How to restart Resourcespace
 ```

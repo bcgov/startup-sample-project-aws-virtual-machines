@@ -69,7 +69,7 @@ module "asg" {
   lc_name                   = var.lc_name
   image_id                  = var.image_id
   security_groups           = [module.network.aws_security_groups.web.id]
-  instance_type             = (var.target_env != "prod" ? "t3a.small" : "t3a.medium")
+  instance_type             = (var.target_env != "prod" ? "t3a.micro" : "t3a.small")
   iam_instance_profile_name = aws_iam_instance_profile.ec2_profile.name
   user_data                 = data.template_file.userdata_script.rendered
   use_lc                    = true
