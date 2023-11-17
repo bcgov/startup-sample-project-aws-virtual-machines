@@ -54,9 +54,9 @@ The rds_password and host name are in the AWS Secrets Manager in "rds-db-credent
 
 ### Run the commands below to copy the default filestore data
 ```
-sudo cp -r /opt/bitnami/resourcespace/filestore.bitnami/* /opt/bitnami/resourcespace/filestore
-sudo chown -R bitnami:daemon /opt/bitnami/resourcespace/filestore
-sudo chmod -R 775 /opt/bitnami/resourcespace/filestore
+sudo cp -R /opt/bitnami/resourcespace/filestore.bitnami/system /opt/bitnami/resourcespace/filestore
+sudo chown -R bitnami:daemon /opt/bitnami/resourcespace/filestore/system
+sudo chmod -R 775 /opt/bitnami/resourcespace/filestore/system
 ```
 
 ### After all the steps above are complete...
