@@ -1,5 +1,11 @@
 # variables.tf
 
+variable "image_id" {
+  description = "id of the AWS Marketplace AMI (Amazon Machine Image) for Bitnami ResourceSpace"
+  default     = "ami-0f5c9cddddead1817"
+  type        = string
+}
+
 variable "target_env" {
   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
 }
@@ -13,12 +19,6 @@ variable "git_url" {
 variable "lc_name" {
   description = "Name of the launch configuration"
   default     = "dam-vm-lc"
-  type        = string
-}
-
-variable "image_id" {
-  description = "id of the ami used"
-  default     = "ami-03e6e252d463d4bfc"
   type        = string
 }
 
