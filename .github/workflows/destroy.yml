@@ -1,6 +1,6 @@
 # This workflow will destroy the terraform scripts which deployed the recquied infrastructure and the startup-sample-app
 
-name: Terraform destroy
+name: Destroy
 
 on:
   workflow_dispatch:
