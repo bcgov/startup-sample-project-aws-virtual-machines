@@ -14,7 +14,8 @@ module "network" {
 # S3 bucket for static assets
 
 resource "aws_s3_bucket" "site" {
-  bucket = "${var.app_name}-site-${data.aws_caller_identity.current.account_id}-${var.aws_region}"
+  bucket        = "${var.app_name}-site-${data.aws_caller_identity.current.account_id}-${var.aws_region}"
+  force_destroy = true
 }
 
 # CloudFront distribution for the S3 bucket

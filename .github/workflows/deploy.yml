@@ -1,14 +1,17 @@
 # This workflow will apply the terraform scripts which would deploy the recquied infrastructure and the startup-sample-app
 
-name: Terraform Apply prod
-
+name: Deploy
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      env:
+        description: select the environment
+        type: environment
+        required: true
 
 env:
   TF_VERSION: 1.5.7
-  environment: prod
+  environment: ${{ inputs.env }}
   SHA: ${{ github.sha }}
   GIT_URL: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY
   Branch: ${GITHUB_REF##*/}
@@ -19,7 +22,7 @@ permissions:
 
 jobs:
   build:
-    environment: prod
+    environment: ${{ inputs.env }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout the repo and building the Backend
@@ -31,8 +34,8 @@ jobs:
 
       - name: setting variables
         run: |
-          cd src/terraform/
-          cat <<EOF > prod.auto.tfvars
+          cd src/terraform
+          cat <<EOF > dev.auto.tfvars
           sha = "${{ env.SHA }}"
           git_url= "${{ env.GIT_URL }}"
           branch = "${{ env.Branch }}"
@@ -47,7 +50,7 @@ jobs:
 
       - name: Deploying startup-sample-project using terraform
         run: |
-          cd src/terraform/
+          cd src/terraform
           cat <<EOF > backend.hcl
           bucket = "${{ vars.S3_BACKEND_NAME }}"
           key = "virtual-machine-app.tfstate"
