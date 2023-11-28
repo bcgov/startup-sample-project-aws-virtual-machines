@@ -32,7 +32,7 @@ jobs:
     outputs:
       github_env: ${{ env.name }}
 
-  build:
+  build_and_plan:
     needs: env_selector
     environment: ${{ needs.env_selector.outputs.github_env }}
     runs-on: ubuntu-latest
