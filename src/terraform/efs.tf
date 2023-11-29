@@ -16,7 +16,7 @@ resource "aws_iam_policy" "efs_policy" {
   name = "BCParks-Dam-EFS-Access"
   path        = "/"
   description = "Allow access EFS"
-    tags        = var.common_tags
+  tags        = var.common_tags
 	policy      = jsonencode(
     {
     "Version": "2012-10-17",

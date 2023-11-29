@@ -4,6 +4,6 @@ output "url" {
 }
 
 output "db" {
-  description = "Aurora database dns name"
-  value       = aws_efs_file_system.efs_filestore.dns_name
+  description = "Aurora database endpoint"
+  value       = aws_rds_cluster.mysql.endpoint
 }

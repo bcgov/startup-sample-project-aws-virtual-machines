@@ -43,13 +43,13 @@ cat /opt/bitnami/resourcespace/include/config.php.bitnami | grep "scramble\|pass
 ### Back up the local database
 Use the `$mysql_password` variable value from above for the `<local_password>`.
 ```
-/opt/bitnami/mariadb/bin/mariadb-dump --add-drop-table -u bn_resourcespace -p<local_passowrd> bitnami_resourcespace | sudo tee /mnt/s3-backup/resourcespace.sql
+/opt/bitnami/mariadb/bin/mariadb-dump --add-drop-table -u bn_resourcespace -p<local_password> bitnami_resourcespace | sudo tee /mnt/s3-backup/resourcespace.sql
 ```
 
 ### Restore the database onto RDS
 The mysql_password and host name can be found in the config.php file.
 ```
-/opt/bitnami/mariadb/bin/mysql --host=<host_name of rds endpoint> --user=admin --password=<mysql_password> resourcespace <  /mnt/s3-backup/resourcespace.sql
+/opt/bitnami/mariadb/bin/mysql --host=<mysql_server (without port)> --user=admin --password=<mysql_password> resourcespace <  /mnt/s3-backup/resourcespace.sql
 ```
 
 ### Run the commands below to copy the default filestore data
@@ -60,7 +60,7 @@ sudo chmod -R 775 /opt/bitnami/resourcespace/filestore/system
 ```
 
 ### After all the steps above are complete...
-Make a small change to userdata.tpl, (such as adding a space or blank line) and run `terragrunt apply` again.
+Run `terragrunt apply` or run the *terraform apply* GitHub action. It's necessary to run terraform in order to get the userdata script (which contains all the secrets) to update in the autoscaler launch configuration. Restarting the container won't update these secrets without running terraform.
 
 ## Transferring files
 
@@ -71,6 +71,8 @@ There is an S3 bucket called `bcparks-dam-dev-backup` which is accessible from t
 ResourceSpace errors are in `/opt/bitnami/apache2/logs/error_log`
 
 There is an activity log in the "Auto Scaling Groups" in the AWS web console.  If your EC2 instance isn't starting then this is a good place to look.
+
+There is a screen in ResourceSpace under "System" / "Installation Check" that is sometimes useful for debugging
 
 ### How to restart Resourcespace
 ```
