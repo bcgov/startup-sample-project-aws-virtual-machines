@@ -58,20 +58,20 @@ sudo -u bitnami git clone ${git_url} bcparks-dam
 # use values from AWS secrets manager secrets to append settings to the file
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
 
-    # MySQL database settings
-    \$mysql_server = '${rds_endpoint}:3306';
-    \$mysql_username = '${mysql_username}';
-    \$mysql_password = '${mysql_password}';
-    \$mysql_db = 'resourcespace';
+# MySQL database settings
+\$mysql_server = '${rds_endpoint}:3306';
+\$mysql_username = '${mysql_username}';
+\$mysql_password = '${mysql_password}';
+\$mysql_db = 'resourcespace';
 
-    # Email settings
-    \$email_notify = '${email_notify}';
-    \$email_from = '${email_from}';
+# Email settings
+\$email_notify = '${email_notify}';
+\$email_from = '${email_from}';
 
-    # Secure keys
-    \$spider_password = '${spider_password}';
-    \$scramble_key = '${scramble_key}';
-    \$api_scramble_key = '${api_scramble_key}';
+# Secure keys
+\$spider_password = '${spider_password}';
+\$scramble_key = '${scramble_key}';
+\$api_scramble_key = '${api_scramble_key}';
 
 END
 # SimpleSAML config
@@ -87,25 +87,25 @@ END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-config-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
-    'entityID' => '${sp_entity_id}',
-    'idp' => '${idp_entity_id}',
+        'entityID' => '${sp_entity_id}',
+        'idp' => '${idp_entity_id}',
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
-    $simplesamlconfig['metadata']['${idp_entity_id}'] = [
+$simplesamlconfig['metadata']['${idp_entity_id}'] = [
     'entityID' => '${idp_entity_id}',
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
-    'Location' => '${single_signon_service_url}',
+        'Location' => '${single_signon_service_url}',
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
-    'Location' => '${single_logout_service_url}',
+        'Location' => '${single_logout_service_url}',
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-3.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
-    'X509Certificate' => '${x509_certificate}',
+        'X509Certificate' => '${x509_certificate}',
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-4.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 

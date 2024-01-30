@@ -42,7 +42,7 @@ jobs:
           role-to-assume: ${{ vars.TERRAFORM_DEPLOY_ROLE_ARN }}
           aws-region: ca-central-1
 
-      - name: deploying workbc-dam using terraform
+      - name: deploying bcparks-dam using terraform
         run: |
           cd src/terraform/
           cat <<EOF > backend.tf
