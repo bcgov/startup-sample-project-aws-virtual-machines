@@ -60,4 +60,4 @@ jobs:
           terraform init -input=false
           terraform apply -auto-approve -input=false
         env:
-          TF_VAR_branch_name: ${{ end.BRANCH_NAME }}
+          TF_VAR_branch_name: ${{ env.BRANCH_NAME }}
