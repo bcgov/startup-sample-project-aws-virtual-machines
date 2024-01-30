@@ -7,16 +7,18 @@
 # All custom settings should be entered in this file.
 # Options may be copied from config.default.php and configured here.
 
+$show_detailed_errors = true;
+
 # Base URL of the installation
-$baseurl = 'http://127.0.0.1'; // Fallback for cron job execution
-// When running cli php scripts, HTTP_HOST is not set
+$baseurl = 'http://127.0.0.1'; # Fallback for cron job execution
+# When running cli php scripts, HTTP_HOST is not set
 if (isset($_SERVER['HTTP_HOST'])) {
     if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
         $_SERVER['SERVER_PORT'] = 443;
         $_SERVER['HTTPS'] = 'true';
-        $baseurl   = 'https://' . $_SERVER['HTTP_HOST'];
+        $baseurl = 'https://' . $_SERVER['HTTP_HOST'];
     } else {
-        $baseurl   = 'http://' . $_SERVER['HTTP_HOST'];
+        $baseurl = 'http://' . $_SERVER['HTTP_HOST'];
     }
 }
 
@@ -28,12 +30,12 @@ $exiftool_path = '/usr/bin';
 $homeanim_folder = 'filestore/system/slideshow_a383ab9e2f595db';
 $php_path="/opt/bitnami/php/bin";
 
-$log_resource_access = false; // Log resource access
-$log_search_performance = false; // Log search performance information
-$log_php_errors = false; // Log php errors
-$log_all_php_errors = false; // Including E_NOTICE and E_WARNING level errors, recommended for debugging only
-$debug_log = false; // General debugging log
-$debug_log_location = '/opt/bitnami/resourcespace/logs/debug.txt'; // Specify the log file path
+$log_resource_access = false; # Log resource access
+$log_search_performance = false; # Log search performance information
+$log_php_errors = false; # Log php errors
+$log_all_php_errors = false; # Including E_NOTICE and E_WARNING level errors, recommended for debugging only
+$debug_log = false; # General debugging log
+$debug_log_location = '/opt/bitnami/resourcespace/logs/debug.txt'; # Specify the log file path
 
 /*
 New Installation Defaults

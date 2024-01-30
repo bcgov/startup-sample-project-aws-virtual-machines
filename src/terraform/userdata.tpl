@@ -75,7 +75,7 @@ tee -a bcparks-dam/src/resourcespace/files/config.php << END
 
 END
 # SimpleSAML config
-cat bcparks-dam/src/resourcespace/files/simplesaml-config-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-config-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
     'technicalcontact_name' => '${technical_contact_name}',
     'technicalcontact_email' => '${technical_contact_email}',
@@ -84,30 +84,30 @@ tee -a bcparks-dam/src/resourcespace/files/config.php << END
     'database.username' => '${saml_database_username}',
     'database.password' => '${saml_database_password}',
 END
-cat bcparks-dam/src/resourcespace/files/simplesaml-config-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
-cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-config-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
     'entityID' => '${sp_entity_id}',
     'idp' => '${idp_entity_id}',
 END
-cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
     $simplesamlconfig['metadata']['${idp_entity_id}'] = [
     'entityID' => '${idp_entity_id}',
 END
-cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
     'Location' => '${single_signon_service_url}',
 END
-cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
     'Location' => '${single_logout_service_url}',
 END
-cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-3.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-3.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
     'X509Certificate' => '${x509_certificate}',
 END
-cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-4.php | tee -a bcparks-dam/src/resourcespace/files/config.php
+sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-4.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 
 
 ## copy the customized config.php file to overwrite the resourcespace config
