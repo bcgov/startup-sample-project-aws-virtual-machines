@@ -10,6 +10,11 @@ variable "target_env" {
   description = "AWS workload account env (e.g. dev, test, prod, sandbox, unclass)"
 }
 
+variable "branch_name" {
+  description = "The name of the branch"
+  type        = string
+}
+
 variable "git_url" {
   description = "url of the git repo to clone the ansible files"
   default     = "https://github.com/bcgov/bcparks-dam.git"
