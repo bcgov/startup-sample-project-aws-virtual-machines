@@ -42,18 +42,29 @@ resource "aws_alb_target_group" "app" {
 data "template_file" "userdata_script" {
   template = file("userdata.tpl")
   vars = {
-    git_url          = var.git_url
-    target_env       = var.target_env
-    aws_region       = var.aws_region
-    rds_endpoint     = aws_rds_cluster.mysql.endpoint
-    efs_dns_name     = aws_efs_file_system.efs_filestore.dns_name
-    mysql_username   = local.secrets.mysql_username
-    mysql_password   = local.secrets.mysql_password
-    email_notify     = local.secrets.email_notify
-    email_from       = local.secrets.email_from
-    spider_password  = local.secrets.spider_password
-    scramble_key     = local.secrets.scramble_key
-    api_scramble_key = local.secrets.api_scramble_key
+    git_url                   = var.git_url
+    target_env                = var.target_env
+    aws_region                = var.aws_region
+    rds_endpoint              = aws_rds_cluster.mysql.endpoint
+    efs_dns_name              = aws_efs_file_system.efs_filestore.dns_name
+    mysql_username            = local.secrets.mysql_username
+    mysql_password            = local.secrets.mysql_password
+    email_notify              = local.secrets.email_notify
+    email_from                = local.secrets.email_from
+    spider_password           = local.secrets.spider_password
+    scramble_key              = local.secrets.scramble_key
+    api_scramble_key          = local.secrets.api_scramble_key
+    technical_contact_name		=	local.secrets.technical_contact_name
+    technical_contact_email		=	local.secrets.technical_contact_email
+    secret_salt								=	local.secrets.secret_salt
+    auth_admin_password				=	local.secrets.auth_admin_password
+    saml_database_username		=	local.secrets.saml_database_username
+    saml_database_password		=	local.secrets.saml_database_password
+    sp_entity_id							=	local.secrets.sp_entity_id
+    idp_entity_id							=	local.secrets.idp_entity_id
+    single_signon_service_url	=	local.secrets.single_signon_service_url
+    single_logout_service_url	=	local.secrets.single_logout_service_url
+    x509_certificate					=	local.secrets.x509_certificate
   }
 }
 
