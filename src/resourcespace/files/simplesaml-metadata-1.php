@@ -1,4 +1,3 @@
-<?php
   'contacts' => [],
   'metadata-set' => 'saml20-idp-remote',
   'SingleSignOnService' => [

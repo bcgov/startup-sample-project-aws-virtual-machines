@@ -1,4 +1,3 @@
-<?php
 $plugins[] = 'simplesaml';
 
 $simplesamlconfig['config'] = [

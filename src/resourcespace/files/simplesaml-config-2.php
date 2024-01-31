@@ -1,4 +1,3 @@
-<?php
     'database.dsn' => 'mysql:host=localhost;dbname=saml',    
     'database.prefix' => '',
     'database.persistent' => false,
