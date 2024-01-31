@@ -1,7 +1,5 @@
 #! /bin/bash
 
-#BRANCH_NAME = ${branch_name}
-
 # INSTALL SSM AGENT
 # This allows SSH access into the VM from the Session Manager web interface.
 # This take a while to start up, so be patient. You can use the EC2 serial console
@@ -56,6 +54,7 @@ sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Da
 echo '### Customizing the Bitnami Resourcespace config ###'
 cd /home/bitnami/repos
 #sudo -u bitnami git clone ${git_url} bcparks-dam
+BRANCH_NAME = "${branch_name}"
 sudo -u bitnami git clone -b $BRANCH_NAME ${git_url} bcparks-dam
 
 # use values from AWS secrets manager secrets to append settings to the file
