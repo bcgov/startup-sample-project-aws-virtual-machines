@@ -95,7 +95,7 @@ tee -a bcparks-dam/src/resourcespace/files/config.php << END
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-authsources-2.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
-$simplesamlconfig['metadata']['${idp_entity_id}'] = [
+\$simplesamlconfig['metadata']['${idp_entity_id}'] = [
     'entityID' => '${idp_entity_id}',
 END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-1.php | tee -a bcparks-dam/src/resourcespace/files/config.php
