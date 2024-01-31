@@ -1,6 +1,6 @@
 #! /bin/bash
 
-BRANCH_NAME = ${branch_name}
+#BRANCH_NAME = ${branch_name}
 
 # INSTALL SSM AGENT
 # This allows SSH access into the VM from the Session Manager web interface.
