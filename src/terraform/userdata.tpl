@@ -113,7 +113,7 @@ END
 sudo cat bcparks-dam/src/resourcespace/files/simplesaml-metadata-4.php | tee -a bcparks-dam/src/resourcespace/files/config.php
 
 
-## copy the customized config.php file to overwrite the resourcespace config
+# copy the customized config.php file to overwrite the resourcespace config
 cd /opt/bitnami/resourcespace/include
 sudo cp config.php config.php.bitnami
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/config.php .
@@ -125,3 +125,9 @@ sudo chmod 664 config.php
 #
 echo '### Clear the tmp folder ###'
 sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
+
+
+# copy the favicon and header image
+cd /opt/bitnami/resourcespace/filestore/system/config
+sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/header_favicon.png .
+sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/linkedheaderimgsrc.png .
