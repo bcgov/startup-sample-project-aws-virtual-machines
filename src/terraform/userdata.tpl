@@ -139,4 +139,4 @@ sudo chmod 664 *.*
 cd ..
 sudo unzip /home/bitnami/repos/bcparks-dam/src/resourcespace/files/montala_support.zip
 sudo chown -R bitnami:daemon plugins
-sudo chmod -R 664 plugins
+sudo chmod -R 775 plugins
