@@ -69,3 +69,5 @@ jobs:
 
           terraform init -input=false
           terraform destroy -auto-approve -input=false
+        env:
+          TF_VAR_branch_name: ${{ env.BRANCH_NAME }}
