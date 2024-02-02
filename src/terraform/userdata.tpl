@@ -131,3 +131,5 @@ sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 cd /opt/bitnami/resourcespace/filestore/system/config
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/header_favicon.png .
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/linkedheaderimgsrc.png .
+sudo chown bitnami:daemon *.*
+sudo chmod 664 *.*
