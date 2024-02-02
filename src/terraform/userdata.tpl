@@ -48,6 +48,12 @@ sudo mkdir /mnt/s3-backup
 sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Dam-EC2-Role -o use_cache=/tmp -o allow_other -o uid=0 -o gid=1 -o mp_umask=002  -o multireq_max=5 -o use_path_request_style -o url=https://s3-${aws_region}.amazonaws.com
 
 
+# Copy the default filestore data
+sudo cp -R /opt/bitnami/resourcespace/filestore.bitnami/system /opt/bitnami/resourcespace/filestore
+sudo chown -R bitnami:daemon /opt/bitnami/resourcespace/filestore/system
+sudo chmod -R 775 /opt/bitnami/resourcespace/filestore/system
+
+
 # CUSTOMIZE THE BITNAMI RESOURCESPACE CONFIG
 # Download all the files from our git repo to get our customized copy of config.php
 #
@@ -121,10 +127,10 @@ sudo chown bitnami:daemon config.php
 sudo chmod 664 config.php
 
 
-# CLEAR THE TMP FOLDER
-#
-echo '### Clear the tmp folder ###'
-sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
+# find the slideshow folder name and update the reference in config.php
+DIRECTORY=$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
+DIRECTORY_NAME=$(basename "$DIRECTORY")
+sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/${DIRECTORY_NAME}'|" /opt/bitnami/resourcespace/include/config.php
 
 
 # copy the favicon, header image, and custom font (BC Sans)
@@ -135,8 +141,23 @@ sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/custom_font.woff
 sudo chown bitnami:daemon *.*
 sudo chmod 664 *.*
 
+
 # extract the Montala Support plugin
-cd ..
+cd /opt/bitnami/resourcespace/filestore/system
 sudo unzip /home/bitnami/repos/bcparks-dam/src/resourcespace/files/montala_support.zip
 sudo chown -R bitnami:daemon plugins
 sudo chmod -R 775 plugins
+
+
+# Delete cache files
+sudo rm /opt/bitnami/resourcespace/filestore/tmp/querycache/*
+
+
+# CLEAR THE TMP FOLDER
+echo '### Clear the tmp folder ###'
+sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
+
+
+# Set the php memory_limit (999M recommended by Montala)
+sudo sed -i 's/memory_limit = .*/memory_limit = 999M/' /opt/bitnami/php/etc/php.ini
+sudo /opt/bitnami/ctlscript.sh restart php
