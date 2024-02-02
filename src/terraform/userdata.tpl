@@ -127,9 +127,16 @@ echo '### Clear the tmp folder ###'
 sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 
 
-# copy the favicon and header image
+# copy the favicon, header image, and custom font (BC Sans)
 cd /opt/bitnami/resourcespace/filestore/system/config
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/header_favicon.png .
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/linkedheaderimgsrc.png .
+sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/custom_font.woff2 .
 sudo chown bitnami:daemon *.*
 sudo chmod 664 *.*
+
+# extract the Montala Support plugin
+cd ..
+sudo unzip /home/bitnami/repos/bcparks-dam/src/resourcespace/files/montala_support.zip
+sudo chown -R bitnami:daemon plugins
+sudo chmod -R 664 plugins
