@@ -159,7 +159,7 @@ echo '### Clear the tmp folder ###'
 sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 
 #sudo /opt/bitnami/ctlscript.sh restart
-{
+#{
 # Set the php memory_limit (999M recommended by Montala)
 # not working
 sudo sed -i 's/memory_limit = .*/memory_limit = 999M/' /opt/bitnami/php/etc/php.ini
@@ -189,4 +189,4 @@ echo "extension=apcu.so" | sudo tee /opt/bitnami/php/etc/conf.d/apcu.ini
 cd /tmp
 #sudo rm -R apcu
 sudo /opt/bitnami/ctlscript.sh restart
-} >> /var/log/user_data.log 2>&1
+#} >> /var/log/user_data.log 2>&1
