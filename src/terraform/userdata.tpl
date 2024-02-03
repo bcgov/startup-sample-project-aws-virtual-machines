@@ -161,8 +161,14 @@ sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 
 # Set the php memory_limit (999M recommended by Montala)
 # not working
+echo "Before sed command:"
+sudo grep memory_limit /opt/bitnami/php/etc/php.ini
+
 sudo sed -i 's/memory_limit = .*/memory_limit = 999M/' /opt/bitnami/php/etc/php.ini
 sudo /opt/bitnami/ctlscript.sh restart php
+
+echo "After sed command:"
+sudo grep memory_limit /opt/bitnami/php/etc/php.ini
 
 
 # Add PHP to path
@@ -186,6 +192,5 @@ sudo make
 sudo make install
 echo "extension=apcu.so" | sudo tee /opt/bitnami/php/etc/conf.d/apcu.ini
 cd /tmp
-sudo rm -R apcu
-sudo /opt/bitnami/ctlscript.sh restart php-fpm
-sudo /opt/bitnami/ctlscript.sh restart apache
+#sudo rm -R apcu
+sudo /opt/bitnami/ctlscript.sh restart
