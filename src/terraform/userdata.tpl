@@ -128,6 +128,7 @@ sudo chmod 664 config.php
 
 
 # find the slideshow folder name and update the reference in config.php
+# not working
 DIRECTORY=$$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
 DIRECTORY_NAME=$$(basename "\$DIRECTORY")
 sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/$${DIRECTORY_NAME}'|" /opt/bitnami/resourcespace/include/config.php
@@ -159,5 +160,32 @@ sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 
 
 # Set the php memory_limit (999M recommended by Montala)
+# not working
 sudo sed -i 's/memory_limit = .*/memory_limit = 999M/' /opt/bitnami/php/etc/php.ini
 sudo /opt/bitnami/ctlscript.sh restart php
+
+
+# Add PHP to path
+export PATH=$PATH:/opt/bitnami/php
+
+
+# Install APC User Cache (APCu)
+# https://pecl.php.net/package/APCu
+sudo apt-get update
+sudo apt-get install build-essential autoconf
+cd /tmp
+sudo mkdir apcu
+cd apcu
+# Set to the latest version compatible with your php version
+sudo wget https://pecl.php.net/get/apcu-5.1.23.tgz
+sudo tar -xf apcu-5.1.23.tgz
+cd apcu-5.1.23
+sudo /opt/bitnami/php/bin/phpize
+sudo ./configure --with-php-config=/opt/bitnami/php/bin/php-config
+sudo make
+sudo make install
+echo "extension=apcu.so" | sudo tee /opt/bitnami/php/etc/conf.d/apcu.ini
+cd /tmp
+sudo rm -R apcu
+sudo /opt/bitnami/ctlscript.sh restart php-fpm
+sudo /opt/bitnami/ctlscript.sh restart apache
