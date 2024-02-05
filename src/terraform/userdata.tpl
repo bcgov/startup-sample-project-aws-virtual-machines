@@ -128,9 +128,17 @@ sudo chmod 664 config.php
 
 
 # find the slideshow folder name and update the reference in config.php
-DIRECTORY=\$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
-DIRECTORY_NAME=\$(basename "$DIRECTORY")
-sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/$DIRECTORY_NAME'|" /opt/bitnami/resourcespace/include/config.php
+#DIRECTORY=\$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
+#DIRECTORY_NAME=\$(basename "$DIRECTORY")
+#sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/$DIRECTORY_NAME'|" /opt/bitnami/resourcespace/include/config.php
+
+# find the slideshow folder name
+find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit > /tmp/slideshow_dir.txt
+DIRECTORY_NAME=$(cat /tmp/slideshow_dir.txt)
+rm /tmp/slideshow_dir.txt
+
+# Update the reference in config.php
+sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/${DIRECTORY_NAME}'|" /opt/bitnami/resourcespace/include/config.php
 
 
 # copy the favicon, header image, and custom font (BC Sans)
