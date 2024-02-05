@@ -150,7 +150,7 @@ cat << 'END' | sudo tee /tmp/update_slideshow.sh
 # Find the slideshow directory and update the config.php file
 DIRECTORY_PATH=\$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
 if [ -n "\$DIRECTORY_PATH" ]; then
-    sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/\${DIRECTORY_PATH}'|" /opt/bitnami/resourcespace/include/config.php
+    sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/\$DIRECTORY_PATH'|" /opt/bitnami/resourcespace/include/config.php
 fi
 END
 # Make the script executable
