@@ -127,38 +127,6 @@ sudo chown bitnami:daemon config.php
 sudo chmod 664 config.php
 
 
-# Find the slideshow folder name and update the reference in config.php
-#DIRECTORY=\$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
-#DIRECTORY_NAME=\$(basename "$DIRECTORY")
-#sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/$DIRECTORY_NAME'|" /opt/bitnami/resourcespace/include/config.php
-
-# find the slideshow folder name
-#find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit > /tmp/slideshow_dir.txt
-#DIRECTORY_NAME=\$(cat /tmp/slideshow_dir.txt)
-#rm /tmp/slideshow_dir.txt
-# Update the reference in config.php
-#sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/\$DIRECTORY_NAME'|" /opt/bitnami/resourcespace/include/config.php
-
-#!/bin/bash
-# Update the reference in config.php
-#DIRECTORY_PATH=$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
-#sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/${DIRECTORY_PATH}'|" /opt/bitnami/resourcespace/include/config.php
-
-# Create and write the script to a file
-cat << 'END' | sudo tee /tmp/update_slideshow.sh
-#!/bin/bash
-# Find the slideshow directory and update the config.php file
-DIRECTORY_PATH=\$(find /opt/bitnami/resourcespace/filestore/system/ -type d -name "slideshow*" -print -quit)
-if [ -n "\$DIRECTORY_PATH" ]; then
-    sudo sed -i "s|'filestore/system/slideshow_[^']*'|'filestore/system/\$DIRECTORY_PATH'|" /opt/bitnami/resourcespace/include/config.php
-fi
-END
-# Make the script executable
-sudo chmod +x /tmp/update_slideshow.sh
-# Execute the script
-sudo /tmp/update_slideshow.sh
-
-
 # copy the favicon, header image, and custom font (BC Sans)
 cd /opt/bitnami/resourcespace/filestore/system/config
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/header_favicon.png .
