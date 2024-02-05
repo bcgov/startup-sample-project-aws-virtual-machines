@@ -183,3 +183,10 @@ cd /tmp
 #sudo rm -R apcu
 sudo /opt/bitnami/ctlscript.sh restart
 #} >> /var/log/user_data.log 2>&1
+
+
+# Update the slideshow directory in config.php
+sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/update_slideshow.sh /tmp/
+sudo chmod +x /tmp/update_slideshow.sh
+sudo /tmp/update_slideshow.sh
+sudo rm /tmp/update_slideshow.sh
