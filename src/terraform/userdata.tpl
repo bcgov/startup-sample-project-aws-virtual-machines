@@ -60,7 +60,8 @@ sudo chmod -R 775 /opt/bitnami/resourcespace/filestore/system
 echo '### Customizing the Bitnami Resourcespace config ###'
 cd /home/bitnami/repos
 #sudo -u bitnami git clone ${git_url} bcparks-dam
-BRANCH_NAME = "${branch_name}"
+# Download from another branch
+#BRANCH_NAME = "${branch_name}"
 #sudo -u bitnami git clone -b $BRANCH_NAME ${git_url} bcparks-dam
 sudo -u bitnami git clone -b rfiddler ${git_url} bcparks-dam
 
@@ -151,12 +152,8 @@ sudo rm /opt/bitnami/resourcespace/filestore/tmp/querycache/*
 echo '### Clear the tmp folder ###'
 sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 
-#sudo /opt/bitnami/ctlscript.sh restart
-#{
 # Set the php memory_limit (999M recommended by Montala)
-# not working
 sudo sed -i 's/memory_limit = .*/memory_limit = 999M/' /opt/bitnami/php/etc/php.ini
-#sudo /opt/bitnami/ctlscript.sh restart
 
 
 # Add PHP to path
@@ -180,9 +177,8 @@ sudo make
 sudo make install
 echo "extension=apcu.so" | sudo tee /opt/bitnami/php/etc/conf.d/apcu.ini
 cd /tmp
-#sudo rm -R apcu
-sudo /opt/bitnami/ctlscript.sh restart
-#} >> /var/log/user_data.log 2>&1
+sudo rm -R apcu
+#sudo /opt/bitnami/ctlscript.sh restart
 
 
 # Update the slideshow directory in config.php
@@ -190,3 +186,5 @@ sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/update_slideshow
 sudo chmod +x /tmp/update_slideshow.sh
 sudo /tmp/update_slideshow.sh
 sudo rm /tmp/update_slideshow.sh
+
+sudo /opt/bitnami/ctlscript.sh restart
