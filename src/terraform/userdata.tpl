@@ -156,8 +156,10 @@ echo '### Clear the tmp folder ###'
 sudo rm -rf /opt/bitnami/resourcespace/filestore/tmp/*
 
 # Set the php memory_limit (999M recommended by Montala)
-sudo sed -i 's/memory_limit = .*/memory_limit = 999M/' /opt/bitnami/php/etc/php.ini
-
+sudo sed -i 's/memory_limit = .*/memory_limit = 2048M/' /opt/bitnami/php/etc/php.ini
+sudo sed -i 's/post_max_size = .*/post_max_size = 999M/' /opt/bitnami/php/etc/php.ini
+sudo sed -i 's/upload_max_filesize = .*/upload_max_filesize = 999M/' /opt/bitnami/php/etc/php.ini
+sudo sed -i 's/max_file_uploads = .*/max_file_uploads = 40/' /opt/bitnami/php/etc/php.ini
 
 # Add PHP to path
 export PATH=$PATH:/opt/bitnami/php
