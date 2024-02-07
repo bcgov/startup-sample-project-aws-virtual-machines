@@ -129,6 +129,9 @@ sudo chmod 664 config.php
 
 
 # copy the favicon, header image, and custom font (BC Sans)
+sudo mkdir /opt/bitnami/resourcespace/filestore/system/config
+sudo chown bitnami:daemon /opt/bitnami/resourcespace/filestore/system/config
+sudo chmod 775 /opt/bitnami/resourcespace/filestore/system/config
 cd /opt/bitnami/resourcespace/filestore/system/config
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/header_favicon.png .
 sudo cp /home/bitnami/repos/bcparks-dam/src/resourcespace/files/linkedheaderimgsrc.png .
