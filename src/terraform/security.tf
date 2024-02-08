@@ -105,11 +105,15 @@ resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_attach" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-# Attachment for the custom policy PBMMAccel-SSMWriteAccessPolicy-143CA3D7
-resource "aws_iam_role_policy_attachment" "ec2_custom_ssm_write_attach" {
-  role       = aws_iam_role.ec2_role.name
-  policy_arn = "arn:aws:iam::093135233083:policy/PBMMAccel-SSMWriteAccessPolicy-143CA3D7"
-}
+# Attachment for the custom policy PBMMAccel-SSMWriteAccessPolicy-xxxxxxxx
+#   Services
+#      KMS: Limited: Read, Write
+#      S3:  Limited: Read, Permissions management, Write
+#resource "aws_iam_role_policy_attachment" "ec2_custom_ssm_write_attach" {
+#  role       = aws_iam_role.ec2_role.name
+#  policy_arn = "arn:aws:iam::093135233083:policy/PBMMAccel-SSMWriteAccessPolicy-143CA3D7" # for DEV
+#  policy_arn = "arn:aws:iam::739959981576:policy/PBMMAccel-SSMWriteAccessPolicy-4F6F3B76" # for TEST
+#}
 
 
 resource "aws_efs_file_system_policy" "efs_policy" {
