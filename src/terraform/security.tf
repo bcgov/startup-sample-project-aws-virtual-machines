@@ -73,23 +73,43 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   tags = var.common_tags
 }
 
+# Attachment for BCParks-Dam-S3-Access
 resource "aws_iam_policy_attachment" "ec2_s3_attach" {
   name       = "dam-s3-policy-attachment"
   roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.s3_policy.arn
 }
 
+# Attachment for BCParks-Dam-EFS-Access
 resource "aws_iam_policy_attachment" "ec2_efs_attach" {
   name       = "dam-efs-policy-attachment"
   roles      = [aws_iam_role.ec2_role.name]
   policy_arn = aws_iam_policy.efs_policy.arn
 }
 
+# Attachment for AmazonSSMDirectoryServiceAccess
 resource "aws_iam_role_policy_attachment" "ec2_ssm_attach" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMDirectoryServiceAccess"
 }
 
+# Attachment for AmazonSSMManagedInstanceCore
+resource "aws_iam_role_policy_attachment" "ec2_ssm_core_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# Attachment for CloudWatchAgentServerPolicy
+resource "aws_iam_role_policy_attachment" "ec2_cloudwatch_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+# Attachment for the custom policy PBMMAccel-SSMWriteAccessPolicy-143CA3D7
+resource "aws_iam_role_policy_attachment" "ec2_custom_ssm_write_attach" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::093135233083:policy/PBMMAccel-SSMWriteAccessPolicy-143CA3D7"
+}
 
 
 resource "aws_efs_file_system_policy" "efs_policy" {
