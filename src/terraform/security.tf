@@ -85,6 +85,13 @@ resource "aws_iam_policy_attachment" "ec2_efs_attach" {
   policy_arn = aws_iam_policy.efs_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ec2_ssm_attach" {
+  name       = "BCParks-Dam-EC2-Role-ssm-attachment"
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMDirectoryServiceAccess"
+}
+
+
 resource "aws_efs_file_system_policy" "efs_policy" {
   file_system_id = aws_efs_file_system.efs_filestore.id
   bypass_policy_lockout_safety_check = true
