@@ -165,6 +165,7 @@ sudo sed -i 's|upload_tmp_dir = .*|upload_tmp_dir = /opt/bitnami/resourcespace/f
 
 # Add PHP to path
 export PATH=$PATH:/opt/bitnami/php
+export PATH=$PATH:/opt/bitnami
 
 
 # Install APC User Cache (APCu)
