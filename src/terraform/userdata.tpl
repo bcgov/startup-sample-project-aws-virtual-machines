@@ -161,7 +161,7 @@ sudo sed -i 's/post_max_size = .*/post_max_size = 999M/' /opt/bitnami/php/etc/ph
 sudo sed -i 's/upload_max_filesize = .*/upload_max_filesize = 999M/' /opt/bitnami/php/etc/php.ini
 sudo sed -i 's/max_file_uploads = .*/max_file_uploads = 40/' /opt/bitnami/php/etc/php.ini
 sudo sed -i 's|upload_tmp_dir = .*|upload_tmp_dir = /opt/bitnami/resourcespace/filestore/tmp|' /opt/bitnami/php/etc/php.ini
-
+sudo sed -i 's|date.timezone = .*|date.timezone = "America/Vancouver"|' /opt/bitnami/php/etc/php.ini
 
 # Add PHP to path
 export PATH=$PATH:/opt/bitnami/php
