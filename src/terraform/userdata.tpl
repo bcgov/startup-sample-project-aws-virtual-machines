@@ -13,7 +13,7 @@ sudo dpkg -i amazon-ssm-agent.deb
 
 
 # INSTALL AMAZON-EFS-UTILS
-# We need to build this from source for Debian Linux. It isn't avaialble otherwise
+# We need to build this from source for Debian Linux; it isn't available, otherwise.
 #
 echo '### Installing amazon-efs-utils ###'
 sudo apt update -y

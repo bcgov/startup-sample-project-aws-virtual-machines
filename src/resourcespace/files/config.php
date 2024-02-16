@@ -21,6 +21,9 @@ if (isset($_SERVER['HTTP_HOST'])) {
         $baseurl = 'http://' . $_SERVER['HTTP_HOST'];
     }
 }
+if (!isset($_SERVER['REQUEST_URI'])) {
+    $_SERVER['REQUEST_URI'] = '/';
+}
 
 # Paths
 $imagemagick_path = '/usr/bin';
@@ -36,6 +39,7 @@ $log_php_errors = false; # Log php errors
 $log_all_php_errors = false; # Including E_NOTICE and E_WARNING level errors, recommended for debugging only
 $debug_log = false; # General debugging log
 $debug_log_location = '/opt/bitnami/resourcespace/logs/debug.txt'; # Specify the log file path
+$show_detailed_errors = false;
 
 /*
 New Installation Defaults
@@ -71,7 +75,8 @@ $daterange_search = true;
 $upload_then_edit = true;
 
 $purge_temp_folder_age = 90;
-$filestore_evenspread = true;
+$filestore_evenspread = true; # enable/disable even spread mode
+$filestore_migrate = true; # allows existing, non-even spread file structure to be read
 
 $comments_resource_enable = true;
 
