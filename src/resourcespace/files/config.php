@@ -77,6 +77,7 @@ $upload_then_edit = true;
 $purge_temp_folder_age = 90;
 $filestore_evenspread = true; # enable/disable even spread mode
 $filestore_migrate = true; # allows existing, non-even spread file structure to be read
+$originals_separate_storage = true; # separate storage of originals from previews
 
 $comments_resource_enable = true;
 

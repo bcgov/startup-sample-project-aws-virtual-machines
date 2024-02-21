@@ -45,20 +45,27 @@ sudo chmod -R 775 filestore*
 echo '### Mounting the S3 bucket ###'
 sudo apt-get install s3fs -y
 sudo mkdir /mnt/s3-backup
-#sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Dam-EC2-Role -o use_cache=/tmp -o allow_other -o uid=0 -o gid=1 -o mp_umask=002  -o multireq_max=5 -o use_path_request_style -o url=https://s3-${aws_region}.amazonaws.com
+# sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Dam-EC2-Role -o use_cache=/tmp -o allow_other -o uid=0 -o gid=1 -o mp_umask=002  -o multireq_max=5 -o use_path_request_style -o url=https://s3-${aws_region}.amazonaws.com
 
 sudo mkdir /opt/bitnami/resourcespace/filestore-s3
-sudo -u bitnami s3fs bcparks-dam-${target_env}-backup /opt/bitnami/resourcespace/filestore-s3 \
+# sudo -u bitnami s3fs bcparks-dam-${target_env}-backup /opt/bitnami/resourcespace/filestore-s3 \
+sudo -u bitnami s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup \
         -o iam_role=BCParks-Dam-EC2-Role \
         -o use_cache=/tmp \
         -o allow_other \
         -o uid=$(id -u bitnami) \
         -o gid=$(id -g daemon) \
-        -o mp_umask=002 \
-        -o umask=007 \
+        -o umask=002 \
         -o multireq_max=5 \
         -o use_path_request_style \
         -o url=https://s3-${aws_region}.amazonaws.com
+
+sudo mkdir /mnt/s3-backup/filestore
+sudo mkdir /mnt/s3-backup/filestore/original
+sudo chown -R bitnami:daemon /mnt/s3-backup/filestore
+sudo mkdir /opt/bitnami/resourcespace/filestore/original
+sudo mkdir /opt/bitnami/resourcespace/filestore/resized
+sudo ln -s /mnt/s3-backup/filestore/original /opt/bitnami/resourcespace/filestore/original
 
 
 # Copy the default filestore data
