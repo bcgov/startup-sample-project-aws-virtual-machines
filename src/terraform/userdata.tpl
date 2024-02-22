@@ -69,11 +69,11 @@ sudo chmod -R 775 /opt/bitnami/resourcespace/filestore/system
 #
 echo '### Customizing the Bitnami Resourcespace config ###'
 cd /home/bitnami/repos
-#sudo -u bitnami git clone ${git_url} bcparks-dam
+sudo -u bitnami git clone ${git_url} bcparks-dam
 # Download from another branch
-#BRANCH_NAME = "${branch_name}"
-#sudo -u bitnami git clone -b $BRANCH_NAME ${git_url} bcparks-dam
-sudo -u bitnami git clone -b rfiddler ${git_url} bcparks-dam
+# BRANCH_NAME = "${branch_name}"
+# sudo -u bitnami git clone -b $BRANCH_NAME ${git_url} bcparks-dam
+# sudo -u bitnami git clone -b rfiddler ${git_url} bcparks-dam
 
 # use values from AWS secrets manager secrets to append settings to the file
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
