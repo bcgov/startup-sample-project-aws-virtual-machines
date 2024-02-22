@@ -2,7 +2,7 @@
 
 variable "image_id" {
   description = "id of the AWS Marketplace AMI (Amazon Machine Image) for Bitnami ResourceSpace"
-  default     = "ami-0f5c9cddddead1817"
+  default     = "ami-0e3cecd2b3d50ee5f"
   type        = string
 }
 

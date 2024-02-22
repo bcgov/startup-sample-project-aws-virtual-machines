@@ -45,17 +45,17 @@ sudo chmod -R 775 filestore*
 echo '### Mounting the S3 bucket ###'
 sudo apt-get install s3fs -y
 sudo mkdir /mnt/s3-backup
-# sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Dam-EC2-Role -o use_cache=/tmp -o allow_other -o uid=0 -o gid=1 -o mp_umask=002  -o multireq_max=5 -o use_path_request_style -o url=https://s3-${aws_region}.amazonaws.com
-sudo -u bitnami s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup \
-        -o iam_role=BCParks-Dam-EC2-Role \
-        -o use_cache=/tmp \
-        -o allow_other \
-        -o uid=$(id -u bitnami) \
-        -o gid=$(id -g daemon) \
-        -o umask=002 \
-        -o multireq_max=5 \
-        -o use_path_request_style \
-        -o url=https://s3-${aws_region}.amazonaws.com
+sudo s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup -o iam_role=BCParks-Dam-EC2-Role -o use_cache=/tmp -o allow_other -o uid=0 -o gid=1 -o mp_umask=002  -o multireq_max=5 -o use_path_request_style -o url=https://s3-${aws_region}.amazonaws.com
+#sudo -u bitnami s3fs bcparks-dam-${target_env}-backup /mnt/s3-backup \
+#        -o iam_role=BCParks-Dam-EC2-Role \
+#        -o use_cache=/tmp \
+#        -o allow_other \
+#        -o uid=$(id -u bitnami) \
+#        -o gid=$(id -g daemon) \
+#        -o umask=002 \
+#        -o multireq_max=5 \
+#        -o use_path_request_style \
+#        -o url=https://s3-${aws_region}.amazonaws.com
 
 
 # Copy the default filestore data
@@ -69,11 +69,11 @@ sudo chmod -R 775 /opt/bitnami/resourcespace/filestore/system
 #
 echo '### Customizing the Bitnami Resourcespace config ###'
 cd /home/bitnami/repos
-sudo -u bitnami git clone ${git_url} bcparks-dam
+# sudo -u bitnami git clone ${git_url} bcparks-dam
 # Download from another branch
 # BRANCH_NAME = "${branch_name}"
 # sudo -u bitnami git clone -b $BRANCH_NAME ${git_url} bcparks-dam
-# sudo -u bitnami git clone -b rfiddler ${git_url} bcparks-dam
+ sudo -u bitnami git clone -b rfiddler ${git_url} bcparks-dam
 
 # use values from AWS secrets manager secrets to append settings to the file
 tee -a bcparks-dam/src/resourcespace/files/config.php << END
